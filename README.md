@@ -2,6 +2,11 @@
 
 A simple synchronous websocket server implementation. Designed for short term connections and best on thread-per-request application servers (e.g. puma).
 
+[![Build Status](https://secure.travis-ci.org/ioquatix/utopia-websocket.png)](http://travis-ci.org/ioquatix/utopia-websocket)
+[![Code Climate](https://codeclimate.com/github/ioquatix/utopia-websocket.png)](https://codeclimate.com/github/ioquatix/utopia-websocket)
+[![Coverage Status](https://coveralls.io/repos/ioquatix/utopia-websocket/badge.svg)](https://coveralls.io/r/ioquatix/utopia-websocket)
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -58,7 +63,9 @@ If you want to handle incoming messages, you must listen for these and then hand
 		success!
 	end
 
-This implementation is currently not designed for many long-term connections as it will 'use' one request for the duration of the websocket life.
+This implementation is currently not designed for many long-term connections as it will 'use' one request for the duration of the websocket life. However, this model is rather simple and easy to reason about. For more complex client/server interactions, a dedicated server using [Celluloid][2] might be more appropriate.
+
+[2]: https://github.com/celluloid/celluloid
 
 ## Contributing
 
