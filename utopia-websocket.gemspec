@@ -5,7 +5,7 @@ require 'utopia/websocket/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "utopia-websocket"
-  spec.version       = Utopia::Websocket::VERSION
+  spec.version       = Utopia::WebSocket::VERSION
   spec.authors       = ["Samuel Williams"]
   spec.email         = ["samuel.williams@oriontransfer.co.nz"]
   spec.summary       = %q{A basic rack.hijack websocket implementation with synchronous execution within rack.}
@@ -20,5 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "websocket-driver", "~> 0.5.1"
 
   spec.add_development_dependency "bundler", "~> 1.6"
+  spec.add_development_dependency "rspec", "~> 3.1.0"
+  spec.add_development_dependency "puma"
   spec.add_development_dependency "rake"
 end
