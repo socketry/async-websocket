@@ -18,69 +18,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require "utopia/websocket/version"
 require 'websocket/driver'
 
-module Utopia
-	def self.WebSocket?(env)
-		::WebSocket::Driver.websocket?(env)
-	end
-	
+module Async
 	module WebSocket
-		class Connection
-			READ_BUFFER_SIZE = 1024*8
+		# This is a basic synchronous websocket client:
+		class Client
+			attr :url
+			attr :driver
 			
-			attr_reader :env, :url
-			
-			def initialize(env, io)
-				@env = env
-				@io = io
+			def initialize(url, socket)
+				@url = url
+				@socket = socket
 				
-				scheme = Rack::Request.new(env).ssl? ? 'wss:' : 'ws:'
-				@url = scheme + '//' + env['HTTP_HOST'] + env['REQUEST_URI']
-				
-				@driver = ::WebSocket::Driver.rack(self)
-				@running = false
-			end
-			
-			def write(string)
-				@io.write(string)
-			end
-			
-			def read
-				@driver.parse(@io.readpartial(READ_BUFFER_SIZE))
-			end
-			
-			def run(&handler)
-				@running = true
-				
-				@driver.on(:close) do
-					@running = false
-				end
-				
-				@driver.on(:open) do
-					yield @driver if block_given?
-				end
+				@driver = ::WebSocket::Driver.client(self)
 				
 				@driver.start
-				
-				while @running
-					self.read
-				end
-			ensure
-				@io.close
 			end
-		end
-		
-		def self.open(env)
-			if ::WebSocket::Driver.websocket?(env)
-				env['rack.hijack'].call
-				
-				connection = Connection.new(env, env['rack.hijack_io'])
-				
-				connection.run do |driver|
-					yield driver
+			
+			def write(data)
+				$stderr.puts "-> #{data.inspect}"
+				@socket.write(data)
+			end
+			
+			def read(amount=1024)
+				while data = @socket.recv(amount)
+					@driver.parse(data)
+					
+					if data.empty?
+						@driver.close
+						
+						return
+					end
 				end
+			rescue EOFError
+				nil
 			end
 		end
 	end

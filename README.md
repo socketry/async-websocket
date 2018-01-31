@@ -1,33 +1,33 @@
-# Utopia::WebSocket
+# Async::WebSocket
 
-A simple synchronous websocket server implementation. Designed for short term connections and best on thread-per-request application servers (e.g. puma).
+A simple asynchronous websocket client/server implementation.
 
-[![Build Status](https://secure.travis-ci.org/ioquatix/utopia-websocket.png)](http://travis-ci.org/ioquatix/utopia-websocket)
-[![Code Climate](https://codeclimate.com/github/ioquatix/utopia-websocket.png)](https://codeclimate.com/github/ioquatix/utopia-websocket)
-[![Coverage Status](https://coveralls.io/repos/ioquatix/utopia-websocket/badge.svg)](https://coveralls.io/r/ioquatix/utopia-websocket)
+[![Build Status](https://secure.travis-ci.org/socketry/async-websocket.svg)](http://travis-ci.org/socketry/async-websocket)
+[![Code Climate](https://codeclimate.com/github/socketry/async-websocket.svg)](https://codeclimate.com/github/socketry/async-websocket)
+[![Coverage Status](https://coveralls.io/repos/socketry/async-websocket/badge.svg)](https://coveralls.io/r/socketry/async-websocket)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-		gem 'utopia-websocket'
+	gem 'async-websocket'
 
 And then execute:
 
-		$ bundle
+	$ bundle
 
 Or install it yourself as:
 
-		$ gem install utopia-websocket
+	$ gem install async-websocket
 
 ## Usage
 
 Here is how to use within `Utopia::Controller`:
 
 	on 'list' do |request|
-		fail! unless Utopia::WebSocket?(request.env)
+		fail! unless Async::WebSocket?(request.env)
 		
-		Utopia::WebSocket.open(request.env) do |connection|
+		Async::WebSocket.open(request.env) do |connection|
 			read, write = IO.pipe
 
 			Process.spawn("ls -lah", :out => write)
@@ -40,7 +40,7 @@ Here is how to use within `Utopia::Controller`:
 			connection.close
 		end
 		
-		success!
+		succeed!
 	end
 
 `connection` is an instance of [`WebSocket::Driver`][1].
@@ -50,21 +50,17 @@ Here is how to use within `Utopia::Controller`:
 If you want to handle incoming messages, you must listen for these and then handle them:
 
 	on 'echo' do |request|
-		fail! unless Utopia::WebSocket?(request.env)
+		fail! unless Async::WebSocket?(request.env)
 		
-		Utopia::WebSocket.open(request.env) do |connection|
+		Async::WebSocket.open(request.env) do |connection|
 			connection.on(:message) do |event|
 				connection.text(event.data)
 				connection.close
 			end
 		end
 		
-		success!
+		succeed!
 	end
-
-This implementation is currently not designed for many long-term connections as it will 'use' one request for the duration of the websocket life. However, this model is rather simple and easy to reason about. For more complex client/server interactions, a dedicated server using [Celluloid][2] might be more appropriate.
-
-[2]: https://github.com/celluloid/celluloid
 
 ## Contributing
 

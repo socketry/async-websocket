@@ -18,48 +18,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'utopia/websocket'
-require 'utopia/websocket/client'
+require 'async/websocket'
+require 'async/websocket/client'
 
 require 'rack/test'
-require 'puma'
+require 'falcon/server'
 
-module Utopia::WebSocket::ConnectionSpec
-	describe Utopia::WebSocket::Connection do
-		include Rack::Test::Methods
-		
-		before(:all) do
-			@app = Rack::Builder.parse_file(File.expand_path('../connection_spec.ru', __FILE__)).first
-			
-			@server = Puma::Server.new(@app)
-			
-			@server.add_tcp_listener('localhost', 8085)
-			
-			@server.run
-			
-			trap(:SIGINT) do
-				@server.stop if @server
-				exit
-			end
+RSpec.describe Async::WebSocket::Connection do
+	include_context Async::RSpec::Reactor
+	let(:server_address) {Async::IO::Endpoint.tcp('0.0.0.0', 9000)}
+	let(:app) {Rack::Builder.parse_file(File.expand_path('../connection_spec.ru', __FILE__)).first}
+	let(:server) {Falcon::Server.new(app, [server_address])}
+
+	it "should connect to the websocket server" do
+		server_task = Async::Reactor.run do
+			server.run
 		end
 		
-		after(:all) do
-			@server.stop
-			@server = nil
-		end
+		events = []
 		
-		it "should connect to the websocket server" do
-			client = Utopia::WebSocket::Client.new("ws://localhost:8085/list", TCPSocket.new('localhost', 8085))
-			
-			events = []
+		server_address.connect do |socket|
+			client = Async::WebSocket::Client.new("ws://localhost:9000/list", socket)
 			
 			client.driver.on(:message) do |event|
+				puts event.inspect
 				events << event
 			end
 			
 			client.read
-			
-			expect(events.size).to be > 0
 		end
+		
+		expect(events.size).to be > 0
+		
+		server_task.stop
 	end
 end

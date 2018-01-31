@@ -1,7 +1,11 @@
 
+prepend Actions
+
 on 'list' do |request|
-	if Utopia::WebSocket?(request.env)
-		Utopia::WebSocket.open(request.env) do |connection|
+	Async.logger.info "Incoming request #{request.inspect}"
+	
+	if Async::WebSocket?(request.env)
+		Async::WebSocket.open(request.env) do |connection|
 			read, write = IO.pipe
 			
 			Process.spawn("ls -lah", :out => write)
@@ -14,6 +18,6 @@ on 'list' do |request|
 			connection.close
 		end
 		
-		success!
+		succeed!
 	end
 end
