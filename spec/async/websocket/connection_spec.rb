@@ -38,14 +38,13 @@ RSpec.describe Async::WebSocket::Connection do
 		events = []
 		
 		server_address.connect do |socket|
-			client = Async::WebSocket::Client.new("ws://localhost:9000/list", socket)
+			client = Async::WebSocket::Client.new(socket)
 			
-			client.driver.on(:message) do |event|
-				puts event.inspect
+			while event = client.next_event
 				events << event
 			end
 			
-			client.read
+			client.close # optional
 		end
 		
 		expect(events.size).to be > 0

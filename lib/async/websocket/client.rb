@@ -24,28 +24,45 @@ module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
 		class Client
-			attr :url
-			attr :driver
+			EVENTS = [:open, :message, :error, :close]
 			
-			def initialize(url, socket)
-				@url = url
+			def initialize(socket, url: "ws://.")
 				@socket = socket
+				@url = url
 				
 				@driver = ::WebSocket::Driver.client(self)
 				
+				@queue = []
+				
+				EVENTS.each do |event|
+					@driver.on(event) do
+						@queue.push event
+					end
+				end
+				
 				@driver.start
+			end
+			
+			attr :driver
+			attr :url
+			
+			def next_event
+				while @queue.empty?
+					data = @socket.recv(1024)
+					
+					return nil if data.empty?
+					
+					@driver.parse(data)
+				end
+				
+				@queue.shift
 			end
 			
 			def write(data)
 				@socket.write(data)
 			end
 			
-			def read
-				while data = @socket.recv(1024) and !data.empty?
-					@driver.parse(data)
-				end
-				
-			ensure
+			def close
 				@driver.close
 			end
 		end
