@@ -37,22 +37,16 @@ module Async
 			end
 			
 			def write(data)
-				$stderr.puts "-> #{data.inspect}"
 				@socket.write(data)
 			end
 			
-			def read(amount=1024)
-				while data = @socket.recv(amount)
+			def read
+				while data = @socket.recv(1024) and !data.empty?
 					@driver.parse(data)
-					
-					if data.empty?
-						@driver.close
-						
-						return
-					end
 				end
-			rescue EOFError
-				nil
+				
+			ensure
+				@driver.close
 			end
 		end
 	end

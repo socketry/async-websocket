@@ -67,8 +67,6 @@ module Async
 				while @running
 					self.read
 				end
-			ensure
-				@io.close
 			end
 		end
 		
