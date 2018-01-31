@@ -4,9 +4,6 @@ source 'https://rubygems.org'
 gemspec
 
 group :test do
-	gem 'puma'
-	gem 'utopia'
-	
 	gem 'rack-test'
 	gem 'simplecov'
 	gem 'coveralls', require: false
