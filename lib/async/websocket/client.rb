@@ -63,6 +63,8 @@ module Async
 				end
 				
 				@queue.shift
+			rescue EOFError
+				return nil
 			end
 			
 			def next_message
