@@ -19,12 +19,13 @@
 # THE SOFTWARE.
 
 require 'websocket/driver'
+require 'json'
 
 module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
 		class Client
-			EVENTS = [:open, :message, :error, :close]
+			EVENTS = [:open, :message, :close]
 			
 			def initialize(socket, url: "ws://.")
 				@socket = socket
@@ -34,9 +35,13 @@ module Async
 				
 				@queue = []
 				
+				@driver.on(:error) do |error|
+					raise error
+				end
+				
 				EVENTS.each do |event|
-					@driver.on(event) do
-						@queue.push event
+					@driver.on(event) do |data|
+						@queue.push(data)
 					end
 				end
 				
@@ -48,14 +53,26 @@ module Async
 			
 			def next_event
 				while @queue.empty?
-					data = @socket.recv(1024)
+					data = @socket.read(1024)
 					
-					return nil if data.empty?
-					
-					@driver.parse(data)
+					if data and !data.empty?
+						@driver.parse(data)
+					else
+						return nil
+					end
 				end
 				
 				@queue.shift
+			end
+			
+			def next_message
+				while event = next_event
+					if event.is_a? ::WebSocket::Driver::MessageEvent
+						return JSON.parse(event.data)
+					elsif event.is_a? ::WebSocket::Driver::CloseEvent
+						return nil
+					end
+				end
 			end
 			
 			def write(data)
