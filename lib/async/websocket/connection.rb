@@ -18,16 +18,73 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'connection'
+require 'websocket/driver'
+require 'json'
 
 module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
-		class Client < Connection
-			def initialize(socket, url = "ws://.")
-				@url = url
+		class Connection
+			EVENTS = [:open, :message, :close]
+			
+			def initialize(socket, driver)
+				@socket = socket
+				@driver = driver
 				
-				super socket, ::WebSocket::Driver.client(self)
+				@queue = []
+				
+				@driver.on(:error) do |error|
+					raise error
+				end
+				
+				EVENTS.each do |event|
+					@driver.on(event) do |data|
+						@queue.push(data)
+					end
+				end
+				
+				@driver.start
+			end
+			
+			attr :driver
+			attr :url
+			
+			def next_event
+				while @queue.empty?
+					data = @socket.read(1024)
+					
+					if data and !data.empty?
+						@driver.parse(data)
+					else
+						return nil
+					end
+				end
+				
+				@queue.shift
+			rescue EOFError
+				return nil
+			end
+			
+			def next_message
+				while event = next_event
+					if event.is_a? ::WebSocket::Driver::MessageEvent
+						return JSON.parse(event.data)
+					elsif event.is_a? ::WebSocket::Driver::CloseEvent
+						return nil
+					end
+				end
+			end
+			
+			def send_message(message)
+				@driver.text(JSON.dump(message))
+			end
+			
+			def write(data)
+				@socket.write(data)
+			end
+			
+			def close
+				@driver.close
 			end
 		end
 	end

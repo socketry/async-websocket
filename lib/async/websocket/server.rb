@@ -22,12 +22,35 @@ require_relative 'connection'
 
 module Async
 	module WebSocket
-		# This is a basic synchronous websocket client:
-		class Client < Connection
-			def initialize(socket, url = "ws://.")
-				@url = url
+		class Server < Connection
+			def initialize(env, socket)
+				scheme = env['rack.url_scheme'] == 'https' ? 'wss' : 'ws'
+				@url = "#{scheme}://#{env['HTTP_HOST']}#{env['REQUEST_URI']}"
 				
-				super socket, ::WebSocket::Driver.client(self)
+				@env = env
+				
+				super socket, ::WebSocket::Driver.rack(self)
+			end
+			
+			attr :env
+			attr :url
+			
+			def self.open(env)
+				if ::WebSocket::Driver.websocket?(env)
+					env['rack.hijack'].call
+					
+					connection = self.new(env, env['rack.hijack_io'])
+					
+					if block_given?
+						begin
+							yield connection
+						ensure
+							connection.close
+						end
+					else
+						return connection
+					end
+				end
 			end
 		end
 	end
