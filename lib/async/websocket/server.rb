@@ -43,7 +43,7 @@ module Async
 					
 					if block_given?
 						begin
-							yield connection
+							yield(connection) || true
 						ensure
 							connection.close
 						end

@@ -1,5 +1,5 @@
 
-require 'async/websocket'
+require 'async/websocket/server'
 
 class Upgrade
 	def initialize(app)
@@ -7,22 +7,16 @@ class Upgrade
 	end
 	
 	def call(env)
-		if Async::WebSocket?(env)
-			Async::WebSocket.open(env) do |connection|
-				read, write = IO.pipe
-				
-				Process.spawn("ls -lah", :out => write)
-				write.close
-				
-				read.each_line do |line|
-					connection.text(line)
-				end
-				
-				connection.close
+		Async::WebSocket::Server.open(env) do |server|
+			read, write = IO.pipe
+			
+			Process.spawn("ls -lah", :out => write)
+			write.close
+			
+			read.each_line do |line|
+				server.driver.text(line)
 			end
-		else
-			@app.call(env)
-		end
+		end or @app.call(env)
 	end
 end
 

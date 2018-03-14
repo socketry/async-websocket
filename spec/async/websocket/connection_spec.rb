@@ -26,12 +26,13 @@ require 'falcon/server'
 
 RSpec.describe Async::WebSocket::Connection do
 	include_context Async::RSpec::Reactor
+	
 	let(:server_address) {Async::IO::Endpoint.tcp('0.0.0.0', 9000)}
 	let(:app) {Rack::Builder.parse_file(File.expand_path('../connection_spec.ru', __FILE__)).first}
 	let(:server) {Falcon::Server.new(app, [server_address])}
 
 	it "should connect to the websocket server" do
-		server_task = Async::Reactor.run do
+		server_task = reactor.async do
 			server.run
 		end
 		
