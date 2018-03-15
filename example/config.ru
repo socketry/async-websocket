@@ -2,8 +2,6 @@
 
 require 'async/websocket/server'
 
-Message = Struct.new(:user, :contents, :created_at)
-
 $connections = []
 
 run lambda {|env|
@@ -17,5 +15,6 @@ run lambda {|env|
 		end
 	end
 	
+	Async::Task.current.sleep(0.1)
 	[200, {}, ["Hello World"]]
 }

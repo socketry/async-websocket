@@ -22,45 +22,31 @@ Or install it yourself as:
 
 ## Usage
 
-Here is how to use within `Utopia::Controller`:
+Here is how to use within `Rack`:
 
-	on 'list' do |request|
-		fail! unless Async::WebSocket?(request.env)
+```ruby
+#!/usr/bin/env falcon serve --concurrency 1 -c
+
+require 'async/websocket/server'
+
+$connections = []
+
+run lambda {|env|
+	Async::WebSocket::Server.open(env) do |connection|
+		$connections << connection
 		
-		Async::WebSocket.open(request.env) do |connection|
-			read, write = IO.pipe
-
-			Process.spawn("ls -lah", :out => write)
-			write.close
-
-			read.each_line do |line|
-				connection.text(line)
-			end
-
-			connection.close
-		end
-		
-		succeed!
-	end
-
-`connection` is an instance of [`WebSocket::Driver`][1].
-
-[1]: https://github.com/faye/websocket-driver-ruby
-
-If you want to handle incoming messages, you must listen for these and then handle them:
-
-	on 'echo' do |request|
-		fail! unless Async::WebSocket?(request.env)
-		
-		Async::WebSocket.open(request.env) do |connection|
-			connection.on(:message) do |event|
-				connection.text(event.data)
-				connection.close
+		while message = connection.next_message
+			$connections.each do |connection|
+				connection.send_message(message)
 			end
 		end
-		
-		succeed!
 	end
+	
+	[200, {}, ["Hello World"]]
+}
+```
+
+And [here is a client program](example/client.rb) which can read input from `stdin` and send messages to the server.
 
 ## Contributing
 

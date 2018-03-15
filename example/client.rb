@@ -35,7 +35,7 @@ Async::Reactor.run do |task|
 		end
 		
 		while message = connection.next_message
-			puts "Message from server: #{message.inspect}"
+			puts "From server: #{message.inspect}"
 		end
 	end
 end
