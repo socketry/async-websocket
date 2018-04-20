@@ -37,9 +37,10 @@ module Async
 			
 			def self.open(env)
 				if ::WebSocket::Driver.websocket?(env)
-					env['rack.hijack'].call
+					# https://github.com/rack/rack/blob/master/SPEC#L89-L93
+					peer = env['rack.hijack'].call
 					
-					connection = self.new(env, env['rack.hijack_io'])
+					connection = self.new(env, peer)
 					
 					if block_given?
 						begin
