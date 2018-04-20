@@ -61,7 +61,7 @@ module Async
 				end
 				
 				@queue.shift
-			rescue EOFError
+			rescue EOFError, Errno::ECONNRESET
 				return nil
 			end
 			
