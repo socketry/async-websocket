@@ -1,0 +1,9 @@
+# Development specific:
+.rspec_status
+.tags*
+
+# Temporary data should not be added to the repository:
+tmp/
+
+# This file should only ever exist on production, and may contain sensitive information:
+config/environment.yaml

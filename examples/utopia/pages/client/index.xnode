@@ -1,0 +1,8 @@
+<content:page>
+	<content:heading>Client</content:heading>
+	
+	<script src="client.js?#{rand}"></script>
+	<section id="response" style="border: 1px;"></section>
+	
+	<input id="chat" />
+</content:page>
