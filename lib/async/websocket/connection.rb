@@ -52,6 +52,7 @@ module Async
 			def next_event
 				while @queue.empty?
 					data = @socket.read(1024)
+					puts data.inspect
 					
 					if data and !data.empty?
 						@driver.parse(data)
@@ -73,6 +74,10 @@ module Async
 						return nil
 					end
 				end
+			end
+			
+			def send_text(text)
+				@driver.text(text)
 			end
 			
 			def send_message(message)

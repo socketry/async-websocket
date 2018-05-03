@@ -25,12 +25,16 @@ Async::Reactor.run do |task|
 		
 		task.async do
 			puts "Waiting for input..."
-			while line = stdin.read_until("\n")
-				puts "Sending text: #{line}"
-				connection.send_message({
-					user: USER,
-					text: line,
-				})
+			begin
+				while line = stdin.read_until("\n")
+					puts "Sending text: #{line}"
+					connection.send_message({
+						user: USER,
+						text: line,
+					})
+				end
+			rescue
+				puts "Client error: #{$!}"
 			end
 		end
 		
