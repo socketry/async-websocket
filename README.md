@@ -46,7 +46,7 @@ run lambda {|env|
 }
 ```
 
-And [here is a client program](example/client.rb) which can read input from `stdin` and send messages to the server.
+And [here is a client program](examples/chat/client.rb) which can read input from `stdin` and send messages to the server.
 
 ## Contributing
 
