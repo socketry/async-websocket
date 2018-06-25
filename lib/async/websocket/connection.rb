@@ -50,9 +50,10 @@ module Async
 			attr :url
 			
 			def next_event
+				@socket.flush
+				
 				while @queue.empty?
-					data = @socket.read(1024)
-					puts data.inspect
+					data = @socket.readpartial(1024)
 					
 					if data and !data.empty?
 						@driver.parse(data)
