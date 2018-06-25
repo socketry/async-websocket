@@ -21,10 +21,14 @@
 require 'websocket/driver'
 require 'json'
 
+require 'async/io/stream'
+
 module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
 		class Connection
+			BLOCK_SIZE = Async::IO::Stream::BLOCK_SIZE
+			
 			EVENTS = [:open, :message, :close]
 			
 			def initialize(socket, driver)
@@ -53,7 +57,7 @@ module Async
 				@socket.flush
 				
 				while @queue.empty?
-					data = @socket.readpartial(1024)
+					data = @socket.readpartial(BLOCK_SIZE)
 					
 					if data and !data.empty?
 						@driver.parse(data)
