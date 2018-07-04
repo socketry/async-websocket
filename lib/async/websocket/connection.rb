@@ -95,6 +95,7 @@ module Async
 			
 			def close
 				@driver.close
+				@socket.close
 			end
 		end
 	end

@@ -35,21 +35,28 @@ module Async
 			attr :env
 			attr :url
 			
+			HIJACK_RESPONSE = [-1, {}, []].freeze
+			
 			def self.open(env)
 				if ::WebSocket::Driver.websocket?(env)
+					return nil unless env['rack.hijack?']
+					
 					# https://github.com/rack/rack/blob/master/SPEC#L89-L93
-					peer = env['rack.hijack'].call
+					peer = Async::IO.try_convert(
+						env['rack.hijack'].call
+					)
 					
 					connection = self.new(env, peer)
 					
-					if block_given?
-						begin
-							yield(connection) || true
-						ensure
-							connection.close
-						end
-					else
-						return connection
+					return connection unless block_given?
+					
+					begin
+						yield(connection)
+						
+						return HIJACK_RESPONSE
+					ensure
+						connection.close
+						peer.close
 					end
 				end
 			end
