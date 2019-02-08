@@ -24,11 +24,12 @@ require 'async/websocket/client'
 require 'rack/test'
 require 'falcon/server'
 require 'falcon/adapters/rack'
+require 'async/http/url_endpoint'
 
 RSpec.describe Async::WebSocket::Connection, timeout: 5 do
 	include_context Async::RSpec::Reactor
 	
-	let(:server_address) {Async::IO::Endpoint.tcp('0.0.0.0', 9000)}
+	let(:server_address) {Async::HTTP::URLEndpoint.parse("http://localhost:9000")}
 	let(:app) {Rack::Builder.parse_file(File.expand_path('../connection_spec.ru', __FILE__)).first}
 	let(:server) {Falcon::Server.new(Falcon::Server.middleware(app, verbose: true), server_address)}
 
