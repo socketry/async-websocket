@@ -22,7 +22,44 @@ Or install it yourself as:
 
 ## Usage
 
-Here is how to use within `Rack`:
+There are [examples](examples/) which include:
+
+- [A command line chat client and application server](examples/chat/client.rb) which can read input from `stdin` and send messages to the server.
+- [A utopia-based web application](examples/utopia) which uses a JavaScript client to connect to a web application server.
+
+### Client Side with Async
+
+```ruby
+#!/usr/bin/env ruby
+
+require 'async'
+require 'async/io/stream'
+require 'async/http/url_endpoint'
+require 'async/websocket/client'
+
+USER = ARGV.pop || "anonymous"
+URL = ARGV.pop || "ws://localhost:9292"
+
+Async do |task|
+	endpoint = Async::HTTP::URLEndpoint.parse(URL)
+	headers = {'token' => 'wubalubadubdub'}
+	
+	endpoint.connect do |socket|
+		connection = Async::WebSocket::Client.new(socket, URL, headers)
+		
+		connection.send_message({
+			user: USER,
+			status: "connected",
+		})
+		
+		while message = connection.next_message
+			puts message.inspect
+		end
+	end
+end
+```
+
+### Server Side with Rack & Falcon
 
 ```ruby
 #!/usr/bin/env falcon serve --concurrency 1 -c
@@ -45,8 +82,6 @@ run lambda {|env|
 	[200, {}, ["Hello World"]]
 }
 ```
-
-And [here is a client program](examples/chat/client.rb) which can read input from `stdin` and send messages to the server.
 
 ## Contributing
 
