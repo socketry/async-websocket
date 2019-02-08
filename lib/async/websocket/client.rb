@@ -31,12 +31,12 @@ module Async
 			end
 
 			def build_client(headers)
-        ::WebSocket::Driver.client(self).tap do |client|
-          headers.each do |key, value|
-            client.set_header(key, value)
-          end
-        end
-      end
+				::WebSocket::Driver.client(self).tap do |client|
+					headers.each do |key, value|
+						client.set_header(key, value)
+					end
+				end
+			end
 		end
 	end
 end
