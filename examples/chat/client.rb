@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'async/reactor'
+require 'async'
 require 'async/io/stream'
 require 'async/http/url_endpoint'
 require 'async/websocket/client'
@@ -8,7 +8,7 @@ require 'async/websocket/client'
 USER = ARGV.pop || "anonymous"
 URL = ARGV.pop || "ws://localhost:9292"
 
-Async::Reactor.run do |task|
+Async do |task|
 	stdin = Async::IO::Stream.new(
 		Async::IO::Generic.new($stdin)
 	)
