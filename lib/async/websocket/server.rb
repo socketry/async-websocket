@@ -23,13 +23,13 @@ require_relative 'connection'
 module Async
 	module WebSocket
 		class Server < Connection
-			def initialize(env, socket)
+			def initialize(env, socket, options)
 				scheme = env['rack.url_scheme'] == 'https' ? 'wss' : 'ws'
 				@url = "#{scheme}://#{env['HTTP_HOST']}#{env['REQUEST_URI']}"
 				
 				@env = env
 				
-				super socket, ::WebSocket::Driver.rack(self)
+				super socket, ::WebSocket::Driver.rack(self, options)
 			end
 			
 			attr :env
@@ -37,7 +37,7 @@ module Async
 			
 			HIJACK_RESPONSE = [-1, {}, []].freeze
 			
-			def self.open(env)
+			def self.open(env, options = {})
 				if ::WebSocket::Driver.websocket?(env)
 					return nil unless env['rack.hijack?']
 					
@@ -46,7 +46,7 @@ module Async
 						env['rack.hijack'].call
 					)
 					
-					connection = self.new(env, peer)
+					connection = self.new(env, peer, options)
 					
 					return connection unless block_given?
 					

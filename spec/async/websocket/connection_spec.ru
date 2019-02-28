@@ -7,7 +7,7 @@ class Upgrade
 	end
 	
 	def call(env)
-		result = Async::WebSocket::Server.open(env) do |server|
+		result = Async::WebSocket::Server.open(env, :protocols => %w[ws]) do |server|
 			read, write = IO.pipe
 			
 			Process.spawn("ls -lah", :out => write)

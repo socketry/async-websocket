@@ -29,7 +29,7 @@ require 'async/http/url_endpoint'
 RSpec.describe Async::WebSocket::Connection, timeout: 5 do
 	include_context Async::RSpec::Reactor
 	
-	let(:server_address) {Async::HTTP::URLEndpoint.parse("http://localhost:9000")}
+	let(:server_address) {Async::HTTP::URLEndpoint.parse("http://localhost:9000", :reuse_port => true)}
 	let(:app) {Rack::Builder.parse_file(File.expand_path('../connection_spec.ru', __FILE__)).first}
 	let(:server) {Falcon::Server.new(Falcon::Server.middleware(app, verbose: true), server_address)}
 
@@ -51,6 +51,17 @@ RSpec.describe Async::WebSocket::Connection, timeout: 5 do
 		end
 		
 		expect(events.size).to be > 0
+		
+		server_task.stop
+	end
+
+        it "should send back Sec-WebScoket-Protocol header" do
+		server_task = reactor.async do
+			server.run
+		end
+		
+		# Should send and receive Sec-WebScoket-Protocol header as
+		# `ws`
 		
 		server_task.stop
 	end
