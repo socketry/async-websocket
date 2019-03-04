@@ -1,6 +1,5 @@
 
 require 'covered/rspec'
-require "async/websocket"
 
 # Shared rspec helpers:
 require "async/rspec"

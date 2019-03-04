@@ -18,8 +18,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'upgrade'
+require 'async/websocket/server'
 
-use Upgrade
-
-run lambda {|env| [404, {}, []]}
+class Upgrade
+	def initialize(app)
+		@app = app
+	end
+	
+	def call(env)
+		result = Async::WebSocket::Server.open(env, protocols: ['ws']) do |server|
+			read, write = IO.pipe
+			
+			Process.spawn("ls -lah", :out => write)
+			write.close
+			
+			read.each_line do |line|
+				server.send_text(line)
+			end
+			
+		end or @app.call(env)
+	end
+end

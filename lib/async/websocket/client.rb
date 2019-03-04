@@ -24,15 +24,15 @@ module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
 		class Client < Connection
-			def initialize(socket, url = "ws://.", headers = {})
+			def initialize(socket, url = "ws://.", **options)
 				@url = url
 
-				super socket, build_client(headers)
+				super socket, build_client(**options)
 			end
 
-			def build_client(headers)
-				::WebSocket::Driver.client(self).tap do |client|
-					headers.each do |key, value|
+			def build_client(headers: nil, **options)
+				::WebSocket::Driver.client(self, options).tap do |client|
+					headers&.each do |key, value|
 						client.set_header(key, value)
 					end
 				end
