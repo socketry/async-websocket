@@ -69,7 +69,9 @@ require 'async/websocket/server'
 $connections = []
 
 run lambda {|env|
-	Async::WebSocket::Server.open(env) do |connection|
+        # Options for websocket-driver can be passed as second argument to open
+        # Default: {}
+	Async::WebSocket::Server.open(env, options = {}) do |connection|
 		$connections << connection
 		
 		while message = connection.next_message
