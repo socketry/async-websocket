@@ -69,9 +69,9 @@ require 'async/websocket/server'
 $connections = []
 
 run lambda {|env|
-        # Options for websocket-driver can be passed as second argument to open
-        # Default: {}
-	Async::WebSocket::Server.open(env, { protocols: %w[ws] }) do |connection|
+        # Options for websocket-driver-ruby can be passed as second argument to open
+        # Supported options here: https://github.com/faye/websocket-driver-ruby#driver-api
+	Async::WebSocket::Server.open(env, protocols: ['ws']) do |connection|
 		$connections << connection
 		
 		while message = connection.next_message
