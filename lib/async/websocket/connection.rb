@@ -19,7 +19,6 @@
 # THE SOFTWARE.
 
 require 'websocket/driver'
-require 'json'
 
 require 'async/io/stream'
 
@@ -74,7 +73,7 @@ module Async
 			def next_message
 				while event = next_event
 					if event.is_a? ::WebSocket::Driver::MessageEvent
-						return JSON.parse(event.data)
+						return event.data
 					elsif event.is_a? ::WebSocket::Driver::CloseEvent
 						return nil
 					end
@@ -86,7 +85,7 @@ module Async
 			end
 			
 			def send_message(message)
-				@driver.text(JSON.dump(message))
+				@driver.text(message)
 			end
 			
 			def write(data)
