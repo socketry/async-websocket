@@ -2,10 +2,10 @@
 
 require 'async/websocket/server'
 
-require 'async/actor'
+# require 'async/actor'
 require 'set'
 
-bus = Async::Actor::Bus::Redis.new
+# bus = Async::Actor::Bus::Redis.new
 
 class Room
 	def initialize
@@ -25,24 +25,24 @@ class Room
 	end
 end
 
-bus.supervise(:room) do
-	Room.new
-end
+# bus.supervise(:room) do
+# 	Room.new
+# end
+
+$room = Room.new
 
 run lambda {|env|
-	room = bus[:room]
-	
 	Async::WebSocket::Server.open(env) do |connection|
 		begin
-			room.connect(connection)
+			$room.connect(connection)
 			
 			while message = connection.next_message
-				room.each do |connection|
+				$room.each do |connection|
 					connection.send_message(message)
 				end
 			end
 		rescue
-			room.disconnect(connection)
+			$room.disconnect(connection)
 		end
 	end
 	
