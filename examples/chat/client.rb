@@ -24,9 +24,7 @@ Async do |task|
 		})
 		
 		task.async do
-			puts "Waiting for input..."
 			while line = stdin.read_until("\n")
-				puts "Sending text: #{line}"
 				connection.send_message({
 					user: USER,
 					text: line,
@@ -35,7 +33,7 @@ Async do |task|
 		end
 		
 		while message = connection.next_message
-			puts "From server: #{message.inspect}"
+			puts ": #{message.inspect}"
 		end
 	end
 end

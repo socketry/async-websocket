@@ -1,15 +1,16 @@
-#!/usr/bin/env falcon serve --concurrency 1 -c
+#!/usr/bin/env falcon serve --count 1 -c
 
 require 'async/websocket/server'
+require 'async/clock'
+require 'async/semaphore'
+require 'async/logger'
 
-# require 'async/actor'
 require 'set'
-
-# bus = Async::Actor::Bus::Redis.new
 
 class Room
 	def initialize
 		@connections = Set.new
+		@semaphore = Async::Semaphore.new(512)
 	end
 	
 	def connect connection
@@ -23,29 +24,34 @@ class Room
 	def each(&block)
 		@connections.each(&block)
 	end
-end
-
-# bus.supervise(:room) do
-# 	Room.new
-# end
-
-$room = Room.new
-
-run lambda {|env|
-	Async::WebSocket::Server.open(env) do |connection|
-		begin
-			$room.connect(connection)
-			
-			while message = connection.next_message
-				$room.each do |connection|
-					connection.send_message(message)
-				end
+	
+	def broadcast(message)
+		Async.logger.info "Broadcast: #{message.inspect}"
+		start_time = Async::Clock.now
+		
+		@connections.each do |connection|
+			@semaphore.async do
+				connection.send_message(message)
 			end
-		rescue
-			$room.disconnect(connection)
 		end
+		
+		end_time = Async::Clock.now
+		Async.logger.info "Duration: #{(end_time - start_time).round(3)}s for #{@connections.count} connected clients."
 	end
 	
-	Async::Task.current.sleep(0.1)
-	[200, {}, ["Hello World"]]
-}
+	def call(env)
+		Async::WebSocket::Server.open(env) do |connection|
+			begin
+				self.connect(connection)
+				
+				while message = connection.next_message
+					self.broadcast(message)
+				end
+			ensure
+				self.disconnect(connection)
+			end
+		end
+	end
+end
+
+run Room.new
