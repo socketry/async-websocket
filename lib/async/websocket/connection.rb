@@ -29,7 +29,8 @@ module Async
 		class Connection
 			BLOCK_SIZE = Async::IO::Stream::BLOCK_SIZE
 			
-			EVENTS = [:open, :message, :close]
+			# The events which will be pushed onto the queue.
+			EVENTS = [:open, :message, :close].freeze
 			
 			def initialize(socket, driver)
 				@socket = socket
@@ -42,17 +43,23 @@ module Async
 				end
 				
 				EVENTS.each do |event|
-					@driver.on(event) do |data|
-						@queue.push(data)
-					end
+					@driver.on(event, @queue.method(:push))
 				end
 				
 				@driver.start
 			end
 			
+			# The underlying websocket driver implementation.
 			attr :driver
+			
+			# The URL which was used to initialize the connection.
 			attr :url
 			
+			# The queue of events to process.
+			attr :queue
+			
+			# Wait for the next event to occur and pop it off the queue.
+			# @return the underlying event type (unspecified).
 			def next_event
 				@socket.flush
 				
