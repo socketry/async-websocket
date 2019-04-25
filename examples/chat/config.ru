@@ -1,4 +1,4 @@
-#!/usr/bin/env falcon serve --count 1 -c
+#!/usr/bin/env falcon serve --bind http://localhost:8080 --count 1 -c
 
 require 'async/websocket/server'
 require 'async/clock'

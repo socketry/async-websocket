@@ -6,7 +6,7 @@ require 'async/http/url_endpoint'
 require 'async/websocket/client'
 
 USER = ARGV.pop || "anonymous"
-URL = ARGV.pop || "ws://localhost:9292"
+URL = ARGV.pop || "ws://localhost:8080"
 
 Async do |task|
 	stdin = Async::IO::Stream.new(
