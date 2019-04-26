@@ -49,6 +49,9 @@ module Async
 				@driver.start
 			end
 			
+			# The underlying socket.
+			attr :socket
+			
 			# The underlying websocket driver implementation.
 			attr :driver
 			
