@@ -3,7 +3,7 @@
 require 'async'
 require 'async/io/stream'
 require 'async/http/url_endpoint'
-require 'async/websocket/client'
+require_relative '../../lib/async/websocket/client'
 
 USER = ARGV.pop || "anonymous"
 URL = ARGV.pop || "ws://localhost:8080"
