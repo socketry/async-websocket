@@ -23,7 +23,7 @@ Async do |task|
 			status: "connected",
 		})
 		
-		task.async do
+		input_task = task.async do
 			while line = stdin.read_until("\n")
 				connection.send_message({
 					user: USER,
@@ -35,5 +35,7 @@ Async do |task|
 		while message = connection.next_message
 			puts ": #{message.inspect}"
 		end
+	ensure
+		input_task&.stop
 	end
 end

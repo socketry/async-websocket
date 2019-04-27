@@ -5,9 +5,11 @@ require 'async/semaphore'
 require 'async/clock'
 require 'async/io/stream'
 require 'async/http/url_endpoint'
-require 'async/websocket/client'
+require_relative '../../lib/async/websocket/client'
 
 require 'samovar'
+
+require 'tty/progressbar'
 
 class Command < Samovar::Command
 	options do
@@ -28,15 +30,15 @@ class Command < Samovar::Command
 		endpoint = Async::HTTP::URLEndpoint.parse(@options[:connect], local_address: self.local_address)
 		count = @options[:count]
 		
-		semaphore = Async::Semaphore.new
 		connections = Async::Queue.new
-		
+		progress = TTY::ProgressBar.new("connections [:bar] :current/:total (:eta/:elapsed)", total: count)
+
 		Async do |task|
 			task.logger.info!
 			
 			task.async do
-				while true
-					task.async(*connections.dequeue) do |subtask, socket, client|
+				while connection = connections.dequeue
+					task.async(*connection) do |subtask, socket, client|
 						while message = client.next_message
 							pp message
 						end
@@ -47,15 +49,14 @@ class Command < Samovar::Command
 			end
 			
 			count.times do |i|
-				semaphore.async do
-					socket = endpoint.connect
-					client = Async::WebSocket::Client.new(socket, @options[:connect])
+				socket = endpoint.connect
+				client = Async::WebSocket::Client.new(socket, @options[:connect])
 					
-					connections.enqueue([socket, client])
-				end
+				connections.enqueue([socket, client])
+				progress.advance(1)
 			end
 			
-			Async.logger.info "Connected #{count} clients..."
+			connections.enqueue(nil)
 		end
 	end
 end

@@ -6,3 +6,7 @@ group :test do
 	gem 'rack-test'
 	gem 'pry'
 end
+
+group :development do
+	gem 'tty-progressbar'
+end
