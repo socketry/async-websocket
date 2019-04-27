@@ -15,7 +15,7 @@ Async do |task|
 	
 	endpoint = Async::HTTP::URLEndpoint.parse(URL)
 	
-	endpoint.connect do |socket|
+	endpoint.with(local_address: local_address).connect do |socket|
 		connection = Async::WebSocket::Client.new(socket, URL)
 		
 		connection.send_message({

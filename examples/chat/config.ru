@@ -25,6 +25,12 @@ class Room
 		@connections.each(&block)
 	end
 	
+	def command(code)
+		Async.logger.warn self, "eval(#{code})"
+		
+		eval(code)
+	end
+	
 	def broadcast(message)
 		Async.logger.info "Broadcast: #{message.inspect}"
 		start_time = Async::Clock.now
@@ -45,7 +51,21 @@ class Room
 				self.connect(connection)
 				
 				while message = connection.next_message
-					self.broadcast(message)
+					if message["text"] =~ /^\/(.*?)$/
+						begin
+							result = self.command($1)
+							
+							if result.is_a? Hash
+								connection.send_message(result)
+							else
+								connection.send_message({result: result.inspect})
+							end
+						rescue
+							connection.send_message({error: $!.inspect})
+						end
+					else
+						self.broadcast(message)
+					end
 				end
 			ensure
 				self.disconnect(connection)

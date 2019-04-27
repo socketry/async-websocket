@@ -31,7 +31,7 @@ class Command < Samovar::Command
 		count = @options[:count]
 		
 		connections = Async::Queue.new
-		progress = TTY::ProgressBar.new("connections [:bar] :current/:total (:eta/:elapsed)", total: count)
+		progress = TTY::ProgressBar.new(":rate connection/s [:bar] :current/:total (:eta/:elapsed)", total: count)
 
 		Async do |task|
 			task.logger.info!

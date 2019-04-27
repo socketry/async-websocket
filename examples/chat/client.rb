@@ -18,17 +18,9 @@ Async do |task|
 	endpoint.connect do |socket|
 		connection = Async::WebSocket::Client.new(socket, URL)
 		
-		connection.send_message({
-			user: USER,
-			status: "connected",
-		})
-		
 		input_task = task.async do
 			while line = stdin.read_until("\n")
-				connection.send_message({
-					user: USER,
-					text: line,
-				})
+				connection.send_message({text: line})
 			end
 		end
 		
