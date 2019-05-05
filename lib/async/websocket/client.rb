@@ -35,6 +35,7 @@ module Async
 				client.get(endpoint.path, &block)
 			end
 			
+			# @option protocols [Array] a list of supported sub-protocols to negotiate with the server.
 			def initialize(endpoint, headers: [], protocols: [], version: 13, key: SecureRandom.base64(16))
 				@endpoint = endpoint
 				@version = version
@@ -61,18 +62,24 @@ module Async
 					['sec-websocket-version', @version]
 				] + @headers.to_a
 				
-				if @protocols
-					headers['sec-websocket-protocol'] = @protocols
+				if @protocols.any?
+					headers << ['sec-websocket-protocol', @protocols.join(',')]
 				end
 				
 				return headers
 			end
 			
-			def get(path, &block)
+			def get(path = '/', &block)
 				self.call('GET', path, &block)
 			end
 			
 			HTTP_VERSION = 'HTTP/1.0'.freeze
+			
+			def make_connection(stream, headers)
+				protocol = headers['sec-websocket-protocol']&.first
+				
+				return Connection.new(stream, protocol)
+			end
 			
 			def call(method, path)
 				client = connect
@@ -90,7 +97,7 @@ module Async
 					raise ProtocolError, "Invalid accept header, got #{accept_digest.inspect}!"
 				end
 				
-				connection = Connection.new(stream)
+				connection = make_connection(stream, headers)
 					
 				return connection unless block_given?
 				

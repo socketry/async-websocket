@@ -93,7 +93,7 @@ module Async
 			end
 			
 			def read(stream)
-				raise EOFError unless buffer = stream.read(2)
+				buffer = stream.read_exactly(2)
 				first, second = buffer.unpack("CC")
 				
 				@fin = !!(first & 0b1000_0000)
@@ -104,13 +104,13 @@ module Async
 				@length = second & 0b0111_1111
 				
 				if @length == 126
-					@length = stream.read(2).unpack('n').first
+					@length = stream.read_exactly(2).unpack('n').first
 				elsif @length == 127
-					@length = stream.read(4).unpack('Q>').first
+					@length = stream.read_exactly(4).unpack('Q>').first
 				end
 				
 				if @mask
-					@mask = stream.read(4)
+					@mask = stream.read_exactly(4)
 					@payload = read_mask(@mask, @length, stream)
 				else
 					@payload = stream.read(@length)
@@ -160,7 +160,7 @@ module Async
 			private
 			
 			def read_mask(mask, length, stream)
-				data = stream.read(length)
+				data = stream.read_exactly(length)
 				
 				for i in 0...data.bytesize do
 					data.setbyte(i, data.getbyte(i) ^ mask.getbyte(i % 4))

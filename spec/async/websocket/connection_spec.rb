@@ -53,20 +53,13 @@ RSpec.describe Async::WebSocket::Connection, timeout: nil do
 		server_task.stop
 	end
 
-	it "should send back Sec-WebSocket-Protocol header" do
+	it "should negotiate protocol" do
 		server_task = reactor.async do
 			server.run
 		end
 		
-		# Should send and receive Sec-WebSocket-Protocol header as
-		# `ws`
-		
-		server_address.connect do |socket|
-			client = Async::WebSocket::Client.new(socket, protocols: ['ws'])
-			
-			expect(client.next_event).to be_kind_of(WebSocket::Driver::OpenEvent)
-			
-			expect(client.driver.protocol).to be == 'ws'
+		Async::WebSocket::Client.open(server_address, protocols: ['ws']) do |connection|
+			expect(connection.protocol).to be == 'ws'
 		end
 		
 		server_task.stop

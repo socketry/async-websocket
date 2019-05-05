@@ -27,12 +27,15 @@ module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
 		class Connection < Framer
-			def initialize(stream, mask: SecureRandom.bytes(4), format: JSON)
+			def initialize(stream, protocol, mask: SecureRandom.bytes(4), format: JSON)
 				super(stream)
 				
+				@protocol = protocol
 				@mask = mask
 				@format = format
 			end
+			
+			attr :protocol
 			
 			def next_message
 				self.flush

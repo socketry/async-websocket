@@ -15,10 +15,11 @@ Gem::Specification.new do |spec|
 	spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
 	spec.require_paths = ["lib"]
 	
-	spec.add_dependency "async-io"
+	spec.add_dependency "async-io", "~> 1.23"
+	spec.add_dependency "http-protocol", "~> 0.17"
 	
 	spec.add_development_dependency "async-rspec"
-	spec.add_development_dependency "falcon", "~> 0.17"
+	spec.add_development_dependency "falcon", "~> 0.28"
 	
 	spec.add_development_dependency "covered"
 	spec.add_development_dependency "bundler"

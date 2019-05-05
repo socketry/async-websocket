@@ -23,11 +23,10 @@ require 'async/websocket/server/rack'
 class Upgrade
 	def initialize(app)
 		@app = app
-		Async.logger.debug!
 	end
 	
 	def call(env)
-		Async::WebSocket::Server::Rack.open(env) do |connection|
+		Async::WebSocket::Server::Rack.open(env, supported_protocols: ['ws']) do |connection|
 			read, write = IO.pipe
 			
 			Process.spawn("ls -lah", :out => write)
