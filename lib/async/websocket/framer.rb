@@ -42,8 +42,6 @@ module Async
 				frame.read(@stream)
 				
 				return frame
-			rescue EOFError
-				return nil
 			end
 			
 			def write_frame(frame)

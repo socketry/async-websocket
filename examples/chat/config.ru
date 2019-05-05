@@ -62,7 +62,6 @@ class Room
 			begin
 				self.connect(connection)
 				
-				puts "Waiting for messages..."
 				while message = connection.next_message
 					if message["text"] =~ /^\/(.*?)$/
 						begin
@@ -81,7 +80,6 @@ class Room
 					end
 				end
 			ensure
-				puts "Connection finished..."
 				self.disconnect(connection)
 			end
 		end

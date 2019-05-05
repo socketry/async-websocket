@@ -23,7 +23,7 @@ Async do |task|
 		
 		puts "Connected..."
 		while message = connection.next_message
-			puts ": #{message.inspect}"
+			puts "> #{message.inspect}"
 		end
 	ensure
 		input_task&.stop

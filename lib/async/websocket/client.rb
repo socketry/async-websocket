@@ -82,7 +82,7 @@ module Async
 			
 			def call(method, path)
 				client = connect
-				client.upgrade("websocket")
+				client.upgrade!("websocket")
 				
 				client.write_request(@endpoint.authority, method, @endpoint.path, HTTP_VERSION, self.request_headers)
 				stream = client.write_upgrade_body

@@ -41,7 +41,6 @@ module Async
 				self.flush
 				
 				while frame = self.read_frame
-					pp frame
 					case frame.opcode
 					when Frame::CLOSE
 						return nil
@@ -59,6 +58,7 @@ module Async
 				frame = Frame.new(true, opcode, @mask, payload)
 				
 				self.write_frame(frame)
+				self.flush
 			end
 		end
 	end
