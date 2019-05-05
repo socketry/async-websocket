@@ -19,8 +19,7 @@
 # THE SOFTWARE.
 
 require_relative 'connection'
-
-require 'pry'
+require_relative 'digest'
 
 module Async
 	module WebSocket
