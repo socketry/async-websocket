@@ -39,9 +39,11 @@ module Async
 			def read_frame
 				frame = Frame.new
 				
-				frame.read(@stream)
-				
-				return frame
+				if frame.read(@stream)
+					return frame
+				else
+					return nil
+				end
 			end
 			
 			def write_frame(frame)
