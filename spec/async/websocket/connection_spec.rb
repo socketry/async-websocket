@@ -42,6 +42,8 @@ RSpec.describe Async::WebSocket::Connection, timeout: nil do
 		
 		Async::WebSocket::Client.open(server_address) do |connection|
 			while event = connection.next_message
+				expect(event).to include("line")
+				
 				events << event
 			end
 			
