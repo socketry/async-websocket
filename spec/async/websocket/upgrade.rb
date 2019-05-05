@@ -18,22 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/websocket/server'
+require 'async/websocket/server/rack'
 
 class Upgrade
 	def initialize(app)
 		@app = app
+		Async.logger.debug!
 	end
 	
 	def call(env)
-		result = Async::WebSocket::Server.open(env, protocols: ['ws']) do |server|
+		Async::WebSocket::Server::Rack.open(env) do |connection|
 			read, write = IO.pipe
 			
 			Process.spawn("ls -lah", :out => write)
 			write.close
 			
 			read.each_line do |line|
-				server.send_text(line)
+				connection.send_message({line: line})
 			end
 			
 		end or @app.call(env)

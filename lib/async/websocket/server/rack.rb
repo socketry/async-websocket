@@ -1,4 +1,6 @@
-# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# frozen_string_literals: true
+#
+# Copyright, 2019, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,43 +20,49 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'framer'
-
-require 'json'
-require 'securerandom'
+require_relative '../connection'
+require_relative '../digest'
 
 module Async
 	module WebSocket
-		# This is a basic synchronous websocket client:
-		class Connection < Framer
-			def initialize(stream, mask: SecureRandom.bytes(4), format: JSON)
-				super(stream)
-				
-				@mask = mask
-				@format = format
-			end
-			
-			def next_message
-				self.flush
-				
-				while frame = self.read_frame
-					case frame.opcode
-					when Frame::CLOSE
-						return nil
-					when Frame::TEXT
-						return @format.load(frame.payload)
+		module Server
+			class Rack
+				def self.open(env, **options, &block)
+					return nil unless env['rack.hijack?']
+					
+					connection = self.new(env, **options)
+					
+					if connection.supported?
+						return connection.response(&block)
 					else
-						Async.logger.warn(self) {"Ignoring #{frame}!"}
+						return nil
 					end
 				end
-			end
-			
-			def send_message(data, opcode = Frame::TEXT)
-				payload = @format.dump(data)
 				
-				frame = Frame.new(true, opcode, @mask, payload)
+				def initialize(env, **options)
+					scheme = env['rack.url_scheme'] == 'https' ? 'wss' : 'ws'
+					@url = "#{scheme}://#{env['HTTP_HOST']}#{env['REQUEST_URI']}"
+					
+					@key = env['HTTP_SEC_WEBSOCKET_KEY']
+					@version = Integer(env['HTTP_SEC_WEBSOCKET_VERSION'])
+				end
 				
-				self.write_frame(frame)
+				def supported?
+					@key and @version >= 13
+				end
+				
+				def handle(stream, &block)
+					yield Connection.new(stream)
+				end
+				
+				def response(headers = [], &block)
+					[101, [
+						['connection', 'upgrade'],
+						['upgrade', 'websocket'],
+						['sec-websocket-accept', WebSocket.accept_digest(@key)],
+						['rack.hijack', ->(stream){self.handle(stream, &block)}]
+					] + headers, nil]
+				end
 			end
 		end
 	end

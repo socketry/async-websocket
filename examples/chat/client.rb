@@ -6,18 +6,14 @@ require 'async/http/url_endpoint'
 require_relative '../../lib/async/websocket/client'
 
 USER = ARGV.pop || "anonymous"
-URL = ARGV.pop || "ws://localhost:8080"
+URL = ARGV.pop || "ws://127.0.0.1:8080"
 
 Async do |task|
 	stdin = Async::IO::Stream.new(
 		Async::IO::Generic.new($stdin)
 	)
 	
-	endpoint = Async::HTTP::URLEndpoint.parse(URL)
-	
-	endpoint.connect do |socket|
-		connection = Async::WebSocket::Client.new(socket, URL)
-		
+	Async::WebSocket::Client.open(URL) do |connection|
 		input_task = task.async do
 			while line = stdin.read_until("\n")
 				connection.send_message({text: line})

@@ -1,4 +1,4 @@
-#!/usr/bin/env -S falcon serve --bind http://localhost:8080 --count 1 -c
+#!/usr/bin/env -S falcon serve --bind http://127.0.0.1:8080 --count 1 -c
 
 require_relative '../../lib/async/websocket/server'
 require 'async/clock'
@@ -6,6 +6,8 @@ require 'async/semaphore'
 require 'async/logger'
 
 require 'set'
+
+GC.disable
 
 class Room
 	def initialize
@@ -23,6 +25,16 @@ class Room
 	
 	def each(&block)
 		@connections.each(&block)
+	end
+	
+	def allocations
+		counts = Hash.new{|h,k| h[k] = 0}
+		
+		ObjectSpace.each_object do |object|
+			counts[object.class] += 1
+		end
+		
+		return counts
 	end
 	
 	def command(code)

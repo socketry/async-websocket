@@ -1,4 +1,5 @@
-# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2013, by Ilya Grigorik.
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,11 +19,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'connection'
+require_relative 'frame'
 
 module Async
 	module WebSocket
-		module Server
+		class Framer
+			def initialize(stream)
+				@stream = stream
+			end
+			
+			def close
+				@stream.close
+			end
+			
+			def flush
+				@stream.flush
+			end
+			
+			def read_frame
+				frame = Frame.new
+				
+				frame.read(@stream)
+				
+				return frame
+			rescue EOFError
+				return nil
+			end
+			
+			def write_frame(frame)
+				frame.write(@stream)
+			end
 		end
 	end
 end

@@ -26,8 +26,6 @@ require 'falcon/server'
 require 'falcon/adapters/rack'
 require 'async/http/url_endpoint'
 
-require 'pry'
-
 RSpec.describe Async::WebSocket::Connection, timeout: nil do
 	include_context Async::RSpec::Reactor
 	
@@ -42,14 +40,12 @@ RSpec.describe Async::WebSocket::Connection, timeout: nil do
 		
 		events = []
 		
-		server_address.connect do |socket|
-			client = Async::WebSocket::Client.new(socket)
-			
-			while event = client.next_event
+		Async::WebSocket::Client.open(server_address) do |connection|
+			while event = connection.next_message
 				events << event
 			end
 			
-			client.close # optional
+			connection.close # optional
 		end
 		
 		expect(events.size).to be > 0
