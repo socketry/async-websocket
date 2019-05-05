@@ -93,7 +93,7 @@ module Async
 			end
 			
 			def read(stream)
-				buffer = stream.read(2) or raise raise EOFError
+				buffer = stream.read(2) or raise EOFError
 				first, second = buffer.unpack("CC")
 				
 				@fin = !!(first & 0b1000_0000)

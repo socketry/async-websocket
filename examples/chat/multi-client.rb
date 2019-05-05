@@ -45,6 +45,8 @@ class Command < Samovar::Command
 			task.async do |subtask|
 				while connection = connections.dequeue
 					subtask.async(connection) do |subtask, connection|
+						pp connection.next_message
+						
 						while message = connection.next_message
 							pp message
 						end
@@ -53,7 +55,7 @@ class Command < Samovar::Command
 					end
 				end
 				
-				subtask.children.each(&:stop)
+				# subtask.children.each(&:stop)
 			end
 			
 			client = Async::WebSocket::Client.new(endpoint)

@@ -103,7 +103,7 @@ module Async
 				begin
 					yield connection
 				ensure
-					client.close
+					connection.close
 				end
 			end
 		end

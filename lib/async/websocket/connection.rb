@@ -41,6 +41,7 @@ module Async
 				self.flush
 				
 				while frame = self.read_frame
+					pp frame
 					case frame.opcode
 					when Frame::CLOSE
 						return nil
