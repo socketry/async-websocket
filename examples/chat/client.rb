@@ -18,6 +18,7 @@ Async do |task|
 		input_task = task.async do
 			while line = stdin.read_until("\n")
 				connection.send_message({text: line})
+				connection.flush
 			end
 		end
 		
