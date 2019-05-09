@@ -36,6 +36,8 @@ class Upgrade
 				connection.send_message({line: line})
 			end
 			
+			# Gracefully close the connection:
+			connection.close
 		end or @app.call(env)
 	end
 end

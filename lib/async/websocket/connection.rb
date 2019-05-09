@@ -18,17 +18,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'framer'
+require 'protocol/websocket/connection'
 
 require 'json'
 require 'securerandom'
 
 module Async
 	module WebSocket
+		Frame = ::Protocol::WebSocket::Frame
+		
 		# This is a basic synchronous websocket client:
-		class Connection < Framer
-			def initialize(stream, protocol, mask: SecureRandom.bytes(4), format: JSON)
-				super(stream)
+		class Connection < ::Protocol::WebSocket::Connection
+			def initialize(framer, protocol, mask: SecureRandom.bytes(4), format: JSON)
+				super(framer)
 				
 				@protocol = protocol
 				@mask = mask
@@ -38,27 +40,19 @@ module Async
 			attr :protocol
 			
 			def next_message
-				self.flush
-				
-				while frame = self.read_frame
-					case frame.opcode
-					when Frame::CLOSE
-						return nil
-					when Frame::TEXT
-						return @format.load(frame.payload)
+				if frames = super
+					if frames.first.is_a? Protocol::WebSocket::TextFrame
+						buffer = frames.collect(&:unpack).join
+						
+						return @format.load(buffer)
 					else
-						Async.logger.warn(self) {"Ignoring #{frame}!"}
+						return frames
 					end
 				end
 			end
 			
-			def send_message(data, opcode = Frame::TEXT)
-				payload = @format.dump(data)
-				
-				frame = Frame.new(true, opcode, @mask, payload)
-				
-				self.write_frame(frame)
-				self.flush
+			def send_message(data)
+				send_text(@format.dump(data))
 			end
 		end
 	end

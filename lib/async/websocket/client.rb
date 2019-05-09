@@ -1,3 +1,5 @@
+# frozen_string_literals: true
+#
 # Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,8 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'protocol/http1/connection'
+require 'protocol/websocket/digest'
+
 require_relative 'connection'
-require_relative 'digest'
+require_relative 'error'
 
 module Async
 	module WebSocket
@@ -50,7 +55,7 @@ module Async
 			def connect
 				peer = @endpoint.connect
 				
-				return ::HTTP::Protocol::HTTP1::Connection.new(IO::Stream.new(peer), false)
+				return ::Protocol::HTTP1::Connection.new(IO::Stream.new(peer), false)
 			end
 			
 			def request_headers
@@ -77,7 +82,9 @@ module Async
 			def make_connection(stream, headers)
 				protocol = headers['sec-websocket-protocol']&.first
 				
-				return Connection.new(stream, protocol)
+				framer = Protocol::WebSocket::Framer.new(stream)
+				
+				return Connection.new(framer, protocol)
 			end
 			
 			def call(method, path)
@@ -92,7 +99,7 @@ module Async
 				raise ProtocolError, "Expected status 101, got #{status}!" unless status == 101
 				
 				accept_digest = headers['sec-websocket-accept'].first
-				if accept_digest.nil? or accept_digest != WebSocket.accept_digest(@key)
+				if accept_digest.nil? or accept_digest != ::Protocol::WebSocket.accept_digest(@key)
 					raise ProtocolError, "Invalid accept header, got #{accept_digest.inspect}!"
 				end
 				

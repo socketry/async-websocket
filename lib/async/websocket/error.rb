@@ -18,14 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'digest/sha1'
+require 'protocol/websocket/error'
 
 module Async
 	module WebSocket
-		GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-		
-		def self.accept_digest(key)
-			Digest::SHA1.base64digest(key + GUID)
+		class ProtocolError < ::Protocol::WebSocket::ProtocolError
 		end
 	end
 end

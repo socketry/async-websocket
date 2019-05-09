@@ -20,8 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'protocol/websocket/digest'
+
 require_relative '../connection'
-require_relative '../digest'
 
 module Async
 	module WebSocket
@@ -58,18 +59,20 @@ module Async
 				attr :protocol
 				
 				def supported?
-					@key and @version >= 13
+					@key and @version == 13
 				end
 				
 				def make_connection(stream)
-					Connection.new(stream, @protocol)
+					framer = Protocol::WebSocket::Framer.new(stream)
+					
+					Connection.new(framer, @protocol)
 				end
 				
 				def response_headers
 					headers = [
 						['connection', 'upgrade'],
 						['upgrade', 'websocket'],
-						['sec-websocket-accept', WebSocket.accept_digest(@key)],
+						['sec-websocket-accept', ::Protocol::WebSocket.accept_digest(@key)],
 					]
 					
 					if @protocol

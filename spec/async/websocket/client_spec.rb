@@ -29,7 +29,7 @@ RSpec.describe Async::WebSocket::Client do
 		
 		subject {described_class.new(nil, headers: headers)}
 		
-		it "sets headers on the driver" do
+		it "sets client request headers" do
 			expect(subject.request_headers.to_h).to include(headers.to_h)
 		end
 	end
