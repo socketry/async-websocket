@@ -60,8 +60,6 @@ module Async
 			
 			def request_headers
 				headers = [
-					['upgrade', 'websocket'],
-					['connection', 'upgrade'],
 					['sec-websocket-key', @key],
 					['sec-websocket-version', @version]
 				] + @headers.to_a
