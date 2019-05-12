@@ -17,13 +17,13 @@ Async do |task|
 	Async::WebSocket::Client.open(ENDPOINT) do |connection|
 		input_task = task.async do
 			while line = stdin.read_until("\n")
-				connection.send_message({text: line})
+				connection.write({text: line})
 				connection.flush
 			end
 		end
 		
 		puts "Connected..."
-		while message = connection.next_message
+		while message = connection.read
 			puts "> #{message.inspect}"
 		end
 	ensure

@@ -27,7 +27,7 @@ class Room
 	
 	def broadcast(message)
 		@users.each do |user|
-			user.send_message(message)
+			user.write(message)
 			user.flush
 		end
 	end
@@ -89,7 +89,7 @@ class User < Async::WebSocket::Connection
 		when "name"
 			@name = arguments.first
 		when "look"
-			self.send_message({room: @room.as_json})
+			self.write({room: @room.as_json})
 		else
 			if action = @room.actions[key]
 				action.call(self, *arguments)
@@ -101,7 +101,7 @@ class User < Async::WebSocket::Connection
 	end
 	
 	def notify(text)
-		self.send_message({notify: text})
+		self.write({notify: text})
 		self.flush
 	end
 	
@@ -127,7 +127,7 @@ class Server
 		Async::WebSocket::Server::Rack.open(env, connect: User) do |user|
 			@entrance.enter(user)
 			
-			while message = user.next_message
+			while message = user.read
 				user.handle(message)
 			end
 		ensure

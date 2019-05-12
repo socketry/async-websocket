@@ -39,20 +39,12 @@ module Async
 			
 			attr :protocol
 			
-			def next_message
-				if frames = super
-					if frames.first.is_a? Protocol::WebSocket::TextFrame
-						buffer = frames.collect(&:unpack).join
-						
-						return parse(buffer)
-					else
-						return frames
-					end
-				end
+			def read
+				parse(super)
 			end
 			
-			def send_message(data)
-				send_text(dump(data))
+			def write(object)
+				super(dump(object))
 			end
 			
 			def parse(buffer)

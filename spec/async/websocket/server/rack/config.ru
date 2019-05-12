@@ -10,9 +10,9 @@ run lambda {|env|
 		$connections << connection
 		
 		begin
-			while message = connection.next_message
+			while message = connection.read
 				$connections.each do |connection|
-					connection.send_message(message)
+					connection.write(message)
 					connection.flush
 				end
 			end

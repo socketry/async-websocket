@@ -70,7 +70,7 @@ class Room
 		
 		@connections.each do |connection|
 			@semaphore.async do
-				connection.send_message(message)
+				connection.write(message)
 				connection.flush
 			end
 		end
@@ -82,18 +82,18 @@ class Room
 	def open(connection)
 		self.connect(connection)
 		
-		while message = connection.next_message
+		while message = connection.read
 			if message[:text] =~ /^\/(.*?)$/
 				begin
 					result = self.command($1)
 					
 					if result.is_a? Hash
-						connection.send_message(result)
+						connection.write(result)
 					else
-						connection.send_message({result: result.inspect})
+						connection.write({result: result.inspect})
 					end
 				rescue
-					connection.send_message({error: $!.inspect})
+					connection.write({error: $!.inspect})
 				end
 			else
 				self.broadcast(message)

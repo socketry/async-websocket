@@ -33,7 +33,7 @@ class Upgrade
 			write.close
 			
 			read.each_line do |line|
-				connection.send_message({line: line})
+				connection.write({line: line})
 			end
 			
 			# Gracefully close the connection:

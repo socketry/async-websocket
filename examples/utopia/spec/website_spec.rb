@@ -46,9 +46,9 @@ RSpec.describe "my website" do
 			endpoint.connect do |socket|
 				connection = Async::WebSocket::Client.new(socket, "ws://localhost/server/connect")
 				
-				connection.send_message(hello_message)
+				connection.write(hello_message)
 				
-				message = connection.next_message
+				message = connection.read
 				expect(message).to be == hello_message
 			end
 		end

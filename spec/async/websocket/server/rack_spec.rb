@@ -59,9 +59,9 @@ RSpec.describe Async::WebSocket::Server::Rack do
 	
 	it "can make websocket connection to server" do
 		Async::WebSocket::Client.open(server_address) do |connection|
-			connection.send_message(message)
+			connection.write(message)
 			
-			expect(connection.next_message).to be == message
+			expect(connection.read).to be == message
 			
 			connection.close
 		end

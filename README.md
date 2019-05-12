@@ -51,17 +51,17 @@ Async do |task|
 	Async::WebSocket::Client.open(endpoint) do |connection|
 		input_task = task.async do
 			while line = stdin.read_until("\n")
-				connection.send_message({user: USER, text: line})
+				connection.write({user: USER, text: line})
 				connection.flush
 			end
 		end
 		
-		connection.send_message({
+		connection.write({
 			user: USER,
 			status: "connected",
 		})
 		
-		while message = connection.next_message
+		while message = connection.read
 			puts message.inspect
 		end
 	ensure
@@ -84,9 +84,9 @@ run lambda {|env|
 	Async::WebSocket::Server::Rack.open(env, protocols: ['ws']) do |connection|
 		$connections << connection
 		
-		while message = connection.next_message
+		while message = connection.read
 			$connections.each do |connection|
-				connection.send_message(message)
+				connection.write(message)
 				connection.flush
 			end
 		end

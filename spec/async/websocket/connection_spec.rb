@@ -29,6 +29,6 @@ RSpec.describe Async::WebSocket::Connection do
 			expect(frame.mask).to be == subject.mask
 		end
 		
-		subject.send_message({text: "Hello World"})
+		subject.write({text: "Hello World"})
 	end
 end

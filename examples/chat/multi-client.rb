@@ -45,9 +45,9 @@ class Command < Samovar::Command
 			task.async do |subtask|
 				while connection = connections.dequeue
 					subtask.async(connection) do |subtask, connection|
-						pp connection.next_message
+						pp connection.read
 						
-						while message = connection.next_message
+						while message = connection.read
 							pp message
 						end
 					ensure

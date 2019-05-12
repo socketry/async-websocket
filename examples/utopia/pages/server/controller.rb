@@ -9,10 +9,10 @@ on 'connect' do |request|
 	Async::WebSocket::Server.open(request.env) do |connection|
 		$connections << connection
 		
-		while message = connection.next_message
+		while message = connection.read
 			$connections.each do |connection|
 				puts "Server sending message: #{message.inspect}"
-				connection.send_message(message)
+				connection.write(message)
 			end
 		end
 	end

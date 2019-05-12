@@ -20,14 +20,14 @@ Async do |task|
 			$stdout.write "> "
 			
 			while line = stdin.read_until("\n")
-				connection.send_message({input: line})
+				connection.write({input: line})
 				connection.flush
 				
 				$stdout.write "> "
 			end
 		end
 		
-		while message = connection.next_message
+		while message = connection.read
 			$stdout.puts message
 		end
 	end
