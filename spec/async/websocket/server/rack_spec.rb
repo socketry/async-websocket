@@ -54,7 +54,7 @@ RSpec.describe Async::WebSocket::Server::Rack do
 	end
 	
 	let(:message) do
-		{"text" => "Hello World"}
+		{text: "Hello World"}
 	end
 	
 	it "can make websocket connection to server" do

@@ -83,7 +83,7 @@ class Room
 		self.connect(connection)
 		
 		while message = connection.next_message
-			if message["text"] =~ /^\/(.*?)$/
+			if message[:text] =~ /^\/(.*?)$/
 				begin
 					result = self.command($1)
 					

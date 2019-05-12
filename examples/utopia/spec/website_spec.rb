@@ -27,8 +27,8 @@ RSpec.describe "my website" do
 		
 		let(:hello_message) do
 			{
-				"user" => "test",
-				"text" => "Hello World",
+				user: "test",
+				text: "Hello World",
 			}
 		end
 		
