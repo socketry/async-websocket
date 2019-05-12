@@ -6,7 +6,7 @@ require 'async/websocket/server'
 $connections = []
 
 on 'connect' do |request|
-	Async::WebSocket::Server.open(request.env) do |connection|
+	respond? Async::WebSocket::Server::Rack.open(request.env) do |connection|
 		$connections << connection
 		
 		while message = connection.read
@@ -16,6 +16,4 @@ on 'connect' do |request|
 			end
 		end
 	end
-	
-	succeed!
 end
