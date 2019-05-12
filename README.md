@@ -38,14 +38,22 @@ require 'async/http/url_endpoint'
 require 'async/websocket/client'
 
 USER = ARGV.pop || "anonymous"
-URL = ARGV.pop || "ws://localhost:9292"
+URL = ARGV.pop || "http://localhost:7070"
 
 Async do |task|
-	endpoint = Async::HTTP::URLEndpoint.parse(URL)
-	headers = {'token' => 'wubalubadubdub'}
+	stdin = Async::IO::Stream.new(
+		Async::IO::Generic.new($stdin)
+	)
 	
-	endpoint.connect do |socket|
-		connection = Async::WebSocket::Client.new(socket, URL, headers)
+	endpoint = Async::HTTP::URLEndpoint.parse(URL)
+	
+	Async::WebSocket::Client.open(endpoint) do |connection|
+		input_task = task.async do
+			while line = stdin.read_until("\n")
+				connection.send_message({user: USER, text: line})
+				connection.flush
+			end
+		end
 		
 		connection.send_message({
 			user: USER,
@@ -55,6 +63,8 @@ Async do |task|
 		while message = connection.next_message
 			puts message.inspect
 		end
+	ensure
+		input_task&.stop
 	end
 end
 ```
@@ -62,26 +72,26 @@ end
 ### Server Side with Rack & Falcon
 
 ```ruby
-#!/usr/bin/env falcon serve --concurrency 1 -c
+#!/usr/bin/env -S falcon serve --bind http://localhost:7070 --count 1 -c
 
-require 'async/websocket/server'
+require 'async/websocket/server/rack'
+require 'set'
 
-$connections = []
+$connections = Set.new
 
 run lambda {|env|
-	# Options for websocket-driver-ruby can be passed as second argument to open
-	# Supported options here: https://github.com/faye/websocket-driver-ruby#driver-api
-	Async::WebSocket::Server.open(env, protocols: ['ws']) do |connection|
+	Async::WebSocket::Server::Rack.open(env, protocols: ['ws']) do |connection|
 		$connections << connection
 		
 		while message = connection.next_message
 			$connections.each do |connection|
 				connection.send_message(message)
+				connection.flush
 			end
 		end
-	end
-	
-	[200, {}, ["Hello World"]]
+	ensure
+		$connections.delete(connection)
+	end or [200, {}, ["Hello World"]]
 }
 ```
 

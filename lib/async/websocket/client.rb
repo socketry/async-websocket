@@ -23,6 +23,8 @@
 require 'protocol/http1/connection'
 require 'protocol/websocket/digest'
 
+require 'securerandom'
+
 require_relative 'connection'
 require_relative 'error'
 
@@ -48,6 +50,13 @@ module Async
 				@protocols = protocols
 				
 				@key = key
+			end
+			
+			def mask
+				# Mask is only required on insecure connections, because of bad proxy implementations.
+				unless @endpoint.secure?
+					SecureRandom.bytes(4)
+				end
 			end
 			
 			attr :headers
@@ -82,7 +91,7 @@ module Async
 				
 				framer = Protocol::WebSocket::Framer.new(stream)
 				
-				return Connection.new(framer, protocol)
+				return Connection.new(framer, protocol, mask: self.mask)
 			end
 			
 			def call(method, path)

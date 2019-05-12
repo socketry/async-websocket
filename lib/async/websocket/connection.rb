@@ -21,7 +21,6 @@
 require 'protocol/websocket/connection'
 
 require 'json'
-require 'securerandom'
 
 module Async
 	module WebSocket
@@ -29,7 +28,7 @@ module Async
 		
 		# This is a basic synchronous websocket client:
 		class Connection < ::Protocol::WebSocket::Connection
-			def initialize(framer, protocol, mask: SecureRandom.bytes(4), format: JSON)
+			def initialize(framer, protocol = nil, mask: nil, format: JSON)
 				super(framer)
 				
 				@protocol = protocol

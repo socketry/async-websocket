@@ -18,52 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/websocket'
-require 'async/websocket/client'
+require 'async/websocket/connection'
 
-require 'rack/test'
-require 'falcon/server'
-require 'falcon/adapters/rack'
-require 'async/http/url_endpoint'
-
-RSpec.describe Async::WebSocket::Connection, timeout: nil do
-	include_context Async::RSpec::Reactor
+RSpec.describe Async::WebSocket::Connection do
+	let(:framer) {double}
+	subject {described_class.new(framer)}
 	
-	let(:server_address) {Async::HTTP::URLEndpoint.parse("http://localhost:9000")}
-	let(:app) {Rack::Builder.parse_file(File.expand_path('../connection_spec.ru', __FILE__)).first}
-	let(:server) {Falcon::Server.new(Falcon::Server.middleware(app, verbose: true), server_address)}
-
-	it "should connect to the websocket server" do
-		server_task = reactor.async do
-			server.run
+	it "should use mask if specified" do
+		expect(framer).to receive(:write_frame) do |frame|
+			expect(frame.mask).to be == subject.mask
 		end
 		
-		events = []
-		
-		Async::WebSocket::Client.open(server_address) do |connection|
-			while event = connection.next_message
-				expect(event).to include("line")
-				
-				events << event
-			end
-			
-			connection.close # optional
-		end
-		
-		expect(events.size).to be > 0
-		
-		server_task.stop
-	end
-
-	it "should negotiate protocol" do
-		server_task = reactor.async do
-			server.run
-		end
-		
-		Async::WebSocket::Client.open(server_address, protocols: ['ws']) do |connection|
-			expect(connection.protocol).to be == 'ws'
-		end
-		
-		server_task.stop
+		subject.send_message({"text" => "Hello World"})
 	end
 end

@@ -1,4 +1,4 @@
-#!/usr/bin/env -S falcon serve --bind http://127.0.0.1:8080 --count 1 -c
+#!/usr/bin/env -S falcon --verbose serve --bind http://127.0.0.1:8080 --count 1 -c
 
 require_relative '../../lib/async/websocket/server/rack'
 require 'async/clock'
@@ -71,6 +71,7 @@ class Room
 		@connections.each do |connection|
 			@semaphore.async do
 				connection.send_message(message)
+				connection.flush
 			end
 		end
 		

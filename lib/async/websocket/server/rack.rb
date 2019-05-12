@@ -28,8 +28,15 @@ module Async
 	module WebSocket
 		module Server
 			class Rack
+				def self.websocket?(env)
+					env['HTTP_UPGRADE'] == "websocket"
+				end
+				
 				def self.open(env, **options, &block)
+					# Is hijack supported:
 					return nil unless env['rack.hijack?']
+					
+					return nil unless websocket?(env)
 					
 					connection = self.new(env, **options)
 					
@@ -40,10 +47,9 @@ module Async
 					end
 				end
 				
-				def initialize(env, supported_protocols: [], **options)
-					scheme = env['rack.url_scheme'] == 'https' ? 'wss' : 'ws'
-					@url = "#{scheme}://#{env['HTTP_HOST']}#{env['REQUEST_URI']}"
-					
+				def initialize(env, supported_protocols: [])
+					# scheme = env['rack.url_scheme'] == 'https' ? 'wss' : 'ws'
+					# @url = "#{scheme}://#{env['HTTP_HOST']}#{env['REQUEST_URI']}"
 					@key = env['HTTP_SEC_WEBSOCKET_KEY']
 					@version = Integer(env['HTTP_SEC_WEBSOCKET_VERSION'])
 					
