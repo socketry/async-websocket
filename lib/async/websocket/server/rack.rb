@@ -38,10 +38,10 @@ module Async
 					
 					return nil unless websocket?(env)
 					
-					connection = self.new(env, **options)
+					server = self.new(env, **options)
 					
-					if connection.supported?
-						return connection.response(&block)
+					if server.supported?
+						return server.response(&block)
 					else
 						return nil
 					end
