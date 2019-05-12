@@ -32,12 +32,9 @@ module Async
 				self.new(framer, protocol, **options)
 			end
 			
-			def initialize(framer, protocol = nil, mask: nil, format: JSON)
-				super(framer)
-				
+			def initialize(framer, protocol = nil, **options)
+				super(framer, **options)
 				@protocol = protocol
-				@mask = mask
-				@format = format
 			end
 			
 			attr :protocol
@@ -47,7 +44,7 @@ module Async
 					if frames.first.is_a? Protocol::WebSocket::TextFrame
 						buffer = frames.collect(&:unpack).join
 						
-						return @format.load(buffer)
+						return parse(buffer)
 					else
 						return frames
 					end
@@ -55,7 +52,15 @@ module Async
 			end
 			
 			def send_message(data)
-				send_text(@format.dump(data))
+				send_text(dump(data))
+			end
+			
+			def parse(buffer)
+				JSON.parse(buffer, symbolize_names: true)
+			end
+			
+			def dump(object)
+				JSON.dump(object)
 			end
 		end
 	end

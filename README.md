@@ -24,7 +24,8 @@ Or install it yourself as:
 
 There are [examples](examples/) which include:
 
-- [A command line chat client and application server](examples/chat/client.rb) which can read input from `stdin` and send messages to the server.
+- [A command line chat client/server](examples/chat) which can read input from `stdin` and send messages to the server.
+- [A small MUD client/server](examples/mud) which uses JSON for communation between client/server.
 - [A utopia-based web application](examples/utopia) which uses a JavaScript client to connect to a web application server.
 
 ### Client Side with Async
