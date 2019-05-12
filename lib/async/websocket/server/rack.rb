@@ -47,13 +47,15 @@ module Async
 					end
 				end
 				
-				def initialize(env, supported_protocols: [])
+				def initialize(env, supported_protocols: [], connect: Connection)
 					# scheme = env['rack.url_scheme'] == 'https' ? 'wss' : 'ws'
 					# @url = "#{scheme}://#{env['HTTP_HOST']}#{env['REQUEST_URI']}"
 					@key = env['HTTP_SEC_WEBSOCKET_KEY']
 					@version = Integer(env['HTTP_SEC_WEBSOCKET_VERSION'])
 					
 					@protocol = negotiate_protocol(env, supported_protocols)
+					
+					@connect = connect
 				end
 				
 				def negotiate_protocol(env, supported_protocols)
@@ -71,7 +73,7 @@ module Async
 				def make_connection(stream)
 					framer = Protocol::WebSocket::Framer.new(stream)
 					
-					Connection.new(framer, @protocol)
+					return @connect.call(framer, @protocol)
 				end
 				
 				def response_headers

@@ -42,14 +42,15 @@ module Async
 			end
 			
 			# @option protocols [Array] a list of supported sub-protocols to negotiate with the server.
-			def initialize(endpoint, headers: [], protocols: [], version: 13, key: SecureRandom.base64(16))
+			def initialize(endpoint, headers: [], protocols: [], version: 13, key: SecureRandom.base64(16), connect: Connection)
 				@endpoint = endpoint
 				@version = version
 				@headers = headers
 				
 				@protocols = protocols
-				
 				@key = key
+				
+				@connect = connect
 			end
 			
 			def mask
@@ -62,9 +63,9 @@ module Async
 			attr :headers
 			
 			def connect
-				peer = @endpoint.connect
+				stream = IO::Stream.new(@endpoint.connect)
 				
-				return ::Protocol::HTTP1::Connection.new(IO::Stream.new(peer), false)
+				return ::Protocol::HTTP1::Connection.new(stream, false)
 			end
 			
 			def request_headers
@@ -91,7 +92,7 @@ module Async
 				
 				framer = Protocol::WebSocket::Framer.new(stream)
 				
-				return Connection.new(framer, protocol, mask: self.mask)
+				return @connect.call(framer, protocol, mask: self.mask)
 			end
 			
 			def call(method, path)

@@ -28,6 +28,10 @@ module Async
 		
 		# This is a basic synchronous websocket client:
 		class Connection < ::Protocol::WebSocket::Connection
+			def self.call(framer, protocol = nil, **options)
+				self.new(framer, protocol, **options)
+			end
+			
 			def initialize(framer, protocol = nil, mask: nil, format: JSON)
 				super(framer)
 				
