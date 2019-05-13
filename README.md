@@ -42,31 +42,31 @@ USER = ARGV.pop || "anonymous"
 URL = ARGV.pop || "http://localhost:7070"
 
 Async do |task|
-	stdin = Async::IO::Stream.new(
-		Async::IO::Generic.new($stdin)
-	)
+  stdin = Async::IO::Stream.new(
+          Async::IO::Generic.new($stdin)
+  )
 	
-	endpoint = Async::HTTP::URLEndpoint.parse(URL)
+  endpoint = Async::HTTP::URLEndpoint.parse(URL)
 	
-	Async::WebSocket::Client.open(endpoint) do |connection|
-		input_task = task.async do
-			while line = stdin.read_until("\n")
-				connection.write({user: USER, text: line})
-				connection.flush
-			end
-		end
+  Async::WebSocket::Client.open(endpoint) do |connection|
+    input_task = task.async do
+      while line = stdin.read_until("\n")
+        connection.write({user: USER, text: line})
+	connection.flush
+      end
+    end
 		
-		connection.write({
-			user: USER,
-			status: "connected",
-		})
+    connection.write({
+      user: USER,
+      status: "connected",
+    })
 		
-		while message = connection.read
-			puts message.inspect
-		end
-	ensure
-		input_task&.stop
-	end
+    while message = connection.read
+      puts message.inspect
+    end
+  ensure
+    input_task&.stop
+  end
 end
 ```
 
@@ -81,18 +81,18 @@ require 'set'
 $connections = Set.new
 
 run lambda {|env|
-	Async::WebSocket::Server::Rack.open(env, protocols: ['ws']) do |connection|
-		$connections << connection
+  Async::WebSocket::Server::Rack.open(env, protocols: ['ws']) do |connection|
+    $connections << connection
 		
-		while message = connection.read
-			$connections.each do |connection|
-				connection.write(message)
-				connection.flush
-			end
-		end
-	ensure
-		$connections.delete(connection)
-	end or [200, {}, ["Hello World"]]
+    while message = connection.read
+      $connections.each do |connection|
+        connection.write(message)
+	connection.flush
+      end
+    end
+  ensure
+    $connections.delete(connection)
+  end or [200, {}, ["Hello World"]]
 }
 ```
 
