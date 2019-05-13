@@ -30,10 +30,10 @@ require 'async/http/url_endpoint'
 RSpec.describe Async::WebSocket::Server::Rack do
 	include_context Async::RSpec::Reactor
 	
-	let(:server_address) {Async::HTTP::URLEndpoint.parse("http://localhost:7050")}
+	let(:endpoint) {Async::HTTP::URLEndpoint.parse("http://localhost:7050")}
 	let(:app) {Rack::Builder.parse_file(File.expand_path('rack/config.ru', __dir__)).first}
-	let(:server) {Falcon::Server.new(Falcon::Server.middleware(app), server_address)}
-	let(:client) {Async::HTTP::Client.new(server_address)}
+	let(:server) {Falcon::Server.new(Falcon::Server.middleware(app), endpoint)}
+	let(:client) {Async::HTTP::Client.new(endpoint)}
 	
 	let!(:server_task) do
 		reactor.async do
@@ -58,7 +58,7 @@ RSpec.describe Async::WebSocket::Server::Rack do
 	end
 	
 	it "can make websocket connection to server" do
-		Async::WebSocket::Client.open(server_address) do |connection|
+		Async::WebSocket::Client.open(endpoint) do |connection|
 			connection.write(message)
 			
 			expect(connection.read).to be == message
@@ -68,15 +68,15 @@ RSpec.describe Async::WebSocket::Server::Rack do
 	end
 	
 	it "should use mask over insecure connection" do
-		expect(server_address).to_not be_secure
+		expect(endpoint).to_not be_secure
 		
-		Async::WebSocket::Client.open(server_address) do |connection|
+		Async::WebSocket::Client.open(endpoint) do |connection|
 			expect(connection.mask).to_not be_nil
 		end
 	end
 	
 	it "should negotiate protocol" do
-		Async::WebSocket::Client.open(server_address, protocols: ['ws']) do |connection|
+		Async::WebSocket::Client.open(endpoint, protocols: ['ws']) do |connection|
 			expect(connection.protocol).to be == 'ws'
 		end
 	end
