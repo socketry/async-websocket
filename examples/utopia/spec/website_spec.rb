@@ -4,7 +4,7 @@ require_relative 'website_context'
 require 'falcon/server'
 require 'falcon/adapters/rack'
 
-require 'async/http/url_endpoint'
+require 'async/http/endpoint'
 require 'async/websocket/client'
 
 # Learn about best practice specs from http://betterspecs.org
@@ -22,7 +22,7 @@ RSpec.describe "my website" do
 	context "websockets" do
 		include_context Async::RSpec::Reactor
 		
-		let(:endpoint) {Async::HTTP::URLEndpoint.parse("http://localhost:9282")}
+		let(:endpoint) {Async::HTTP::Endpoint.parse("http://localhost:9282")}
 		let(:server) {Falcon::Server.new(Falcon::Adapters::Rack.new(app), endpoint)}
 		
 		let(:hello_message) do

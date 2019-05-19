@@ -35,7 +35,7 @@ There are [examples](examples/) which include:
 
 require 'async'
 require 'async/io/stream'
-require 'async/http/url_endpoint'
+require 'async/http/endpoint'
 require 'async/websocket/client'
 
 USER = ARGV.pop || "anonymous"
@@ -46,7 +46,7 @@ Async do |task|
 		Async::IO::Generic.new($stdin)
 	)
 	
-	endpoint = Async::HTTP::URLEndpoint.parse(URL)
+	endpoint = Async::HTTP::Endpoint.parse(URL)
 	
 	Async::WebSocket::Client.open(endpoint) do |connection|
 		input_task = task.async do

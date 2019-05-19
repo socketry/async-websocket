@@ -2,12 +2,12 @@
 
 require 'async'
 require 'async/io/stream'
-require 'async/http/url_endpoint'
+require 'async/http/endpoint'
 require_relative '../../lib/async/websocket/client'
 
 USER = ARGV.pop || "anonymous"
 URL = ARGV.pop || "http://127.0.0.1:8080"
-ENDPOINT = Async::HTTP::URLEndpoint.parse(URL)
+ENDPOINT = Async::HTTP::Endpoint.parse(URL)
 
 Async do |task|
 	stdin = Async::IO::Stream.new(

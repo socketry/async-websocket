@@ -2,7 +2,7 @@
 
 require 'async'
 require 'async/io/stream'
-require 'async/http/url_endpoint'
+require 'async/http/endpoint'
 require 'async/websocket/client'
 
 USER = ARGV.pop || "anonymous"
@@ -13,7 +13,7 @@ Async do |task|
 		Async::IO::Generic.new($stdin)
 	)
 	
-	endpoint = Async::HTTP::URLEndpoint.parse(URL)
+	endpoint = Async::HTTP::Endpoint.parse(URL)
 	headers = {'token' => 'wubalubadubdub'}
 	
 	Async::WebSocket::Client.open(endpoint, headers: headers) do |connection|

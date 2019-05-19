@@ -4,7 +4,7 @@ require 'async'
 require 'async/semaphore'
 require 'async/clock'
 require 'async/io/stream'
-require 'async/http/url_endpoint'
+require 'async/http/endpoint'
 require_relative '../../lib/async/websocket/client'
 
 require 'samovar'
@@ -30,7 +30,7 @@ class Command < Samovar::Command
 	end
 	
 	def call
-		endpoint = Async::HTTP::URLEndpoint.parse(@options[:connect], local_address: self.local_address)
+		endpoint = Async::HTTP::Endpoint.parse(@options[:connect], local_address: self.local_address)
 		count = @options[:count]
 		
 		connections = Async::Queue.new
