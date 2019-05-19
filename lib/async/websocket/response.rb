@@ -1,4 +1,4 @@
-# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2017, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,22 +18,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'connection'
-require_relative 'response'
+require_relative 'upgrade_response'
+require_relative 'connect_response'
+
+require_relative 'error'
 
 module Async
 	module WebSocket
-		class Server < HTTP::Middleware
-			def initialize(delegate)
-				super(delegate)
+		module Response
+			def self.websocket?(request)
+				request.protocol == PROTOCOL
 			end
 			
-			def call(request)
-				if request.protocol == PROTOCOL
-					Response.new(request)
-				else
-					super
+			# Send the request to the given connection.
+			def self.for(request, headers = [], **options, &body)
+				if request.version =~ /http\/1/i
+					return UpgradeResponse.new(request, headers, **options, &body)
+				elsif request.version =~ /h2/i
+					return ConnectResponse.new(request, headers, **options, &body)
 				end
+				
+				raise ProtocolError, "Unsupported HTTP version: #{request.version}!"
 			end
 		end
 	end

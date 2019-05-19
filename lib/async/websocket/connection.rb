@@ -28,8 +28,12 @@ module Async
 		
 		# This is a basic synchronous websocket client:
 		class Connection < ::Protocol::WebSocket::Connection
-			def self.call(framer, protocol = nil, **options)
-				self.new(framer, protocol, **options)
+			def self.call(request, framer, **options)
+				protocol = request.headers['sec-websocket-protocol']&.first
+				
+				connection = self.new(framer, protocol, **options)
+				
+				connection.call
 			end
 			
 			def initialize(framer, protocol = nil, **options)
@@ -40,7 +44,9 @@ module Async
 			attr :protocol
 			
 			def read
-				parse(super)
+				if buffer = super
+					parse(buffer)
+				end
 			end
 			
 			def write(object)
@@ -53,6 +59,10 @@ module Async
 			
 			def dump(object)
 				JSON.dump(object)
+			end
+			
+			def call
+				self.close
 			end
 		end
 	end

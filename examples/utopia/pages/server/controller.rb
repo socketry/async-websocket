@@ -1,12 +1,13 @@
 
 prepend Actions
 
-require 'async/websocket/server'
+require 'async/websocket/server/rack'
+require 'set'
 
-$connections = []
+$connections = Set.new
 
 on 'connect' do |request|
-	respond? Async::WebSocket::Server::Rack.open(request.env) do |connection|
+	response = Async::WebSocket::Server::Rack.open(request.env) do |connection|
 		$connections << connection
 		
 		while message = connection.read
@@ -15,5 +16,11 @@ on 'connect' do |request|
 				connection.write(message)
 			end
 		end
+	ensure
+		$connections.delete(connection)
 	end
+	
+	Async.logger.info(self, request, response)
+	
+	respond?(response)
 end

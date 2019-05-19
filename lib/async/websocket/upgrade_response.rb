@@ -1,3 +1,5 @@
+# frozen_string_literals: true
+#
 # Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,22 +20,33 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'connection'
-require_relative 'response'
+require 'async/http/response'
+require 'async/http/body/hijack'
+
+require 'protocol/websocket/digest'
 
 module Async
 	module WebSocket
-		class Server < HTTP::Middleware
-			def initialize(delegate)
-				super(delegate)
-			end
-			
-			def call(request)
-				if request.protocol == PROTOCOL
-					Response.new(request)
+		SWITCHING_PROTOCOLS = "Switching Protocols".freeze
+		
+		# The response from the server back to the client for negotiating HTTP/1.x WebSockets.
+		class UpgradeResponse < HTTP::Response
+			def initialize(request, headers = nil, protocol: nil, &block)
+				headers = headers&.dup || []
+				
+				if accept_nounce = request.headers['sec-websocket-key']&.first
+					headers << ['sec-websocket-accept', ::Protocol::WebSocket.accept_digest(accept_nounce)]
+					status = 101
 				else
-					super
+					status = 400
 				end
+				
+				if protocol
+					headers << ['sec-websocket-protocol', protocol]
+				end
+				
+				body = Async::HTTP::Body::Hijack.wrap(request, &block)
+				super(request.version, status, SWITCHING_PROTOCOLS, headers, body, PROTOCOL)
 			end
 		end
 	end

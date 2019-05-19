@@ -1,4 +1,4 @@
-# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2019, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,23 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'connection'
-require_relative 'response'
+require_relative "server_examples"
 
-module Async
-	module WebSocket
-		class Server < HTTP::Middleware
-			def initialize(delegate)
-				super(delegate)
-			end
-			
-			def call(request)
-				if request.protocol == PROTOCOL
-					Response.new(request)
-				else
-					super
-				end
-			end
-		end
-	end
+require "async/http/protocol/http1"
+
+RSpec.describe Async::HTTP::Protocol::HTTP1 do
+	include_context Async::WebSocket::Server
+end
+
+RSpec.describe Async::HTTP::Protocol::HTTP2 do
+	include_context Async::WebSocket::Server
 end

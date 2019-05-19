@@ -1,3 +1,5 @@
+# frozen_string_literals: true
+#
 # Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,22 +20,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'connection'
-require_relative 'response'
+require 'async/http/middleware'
+require 'async/http/request'
+require 'protocol/http/headers'
 
 module Async
 	module WebSocket
-		class Server < HTTP::Middleware
-			def initialize(delegate)
-				super(delegate)
-			end
-			
-			def call(request)
-				if request.protocol == PROTOCOL
-					Response.new(request)
-				else
-					super
+		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
+		# See https://tools.ietf.org/html/rfc8441 for more details.
+		class ConnectRequest < HTTP::Request
+			def initialize(request, protocols: [], version: 13)
+				request.body ||= Async::HTTP::Body::Writable.new
+				
+				headers = []
+				
+				headers << ['sec-websocket-version', version]
+				
+				if protocols.any?
+					headers << ['sec-websocket-protocol', protocols.join(',')]
 				end
+				
+				merged_headers = ::Protocol::HTTP::Headers::Merged.new(request.headers, headers)
+				
+				super(request.scheme, request.authority, HTTP::CONNECT, request.path, nil, merged_headers, request.body, PROTOCOL)
 			end
 		end
 	end

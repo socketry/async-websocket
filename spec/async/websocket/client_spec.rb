@@ -19,18 +19,27 @@
 # THE SOFTWARE.
 
 require "async/websocket/client"
+require "async/websocket/response"
 
 RSpec.describe Async::WebSocket::Client do
-	context "headers:" do
+	describe '#connect' do
 		let(:headers) {[
 			["Foo", "Bar"],
 			["Baz", "Qux"]
 		]}
 		
-		subject {described_class.new(nil, headers: headers)}
+		let(:client) {double}
+		subject {described_class.new(client)}
+		let(:response) {Async::HTTP::Response.new(404)}
 		
 		it "sets client request headers" do
-			expect(subject.request_headers.to_h).to include(headers.to_h)
+			expect(client).to receive(:call) do |request|
+				expect(request.headers.to_h).to include("Foo", "Baz")
+				
+				response
+			end
+			
+			subject.connect("/server", headers)
 		end
 	end
 end

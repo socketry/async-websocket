@@ -78,13 +78,11 @@ module Async
 				
 				def response_headers
 					headers = [
-						['connection', 'upgrade'],
-						['upgrade', 'websocket'],
-						['sec-websocket-accept', ::Protocol::WebSocket.accept_digest(@key)],
+						['Sec-WebSocket-Accept', ::Protocol::WebSocket.accept_digest(@key)],
 					]
 					
 					if @protocol
-						headers << ['sec-websocket-protocol', @protocol]
+						headers << ['Sec-WebSocket-Protocol', @protocol]
 					end
 					
 					return headers

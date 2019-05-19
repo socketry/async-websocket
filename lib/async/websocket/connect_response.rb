@@ -1,3 +1,5 @@
+# frozen_string_literals: true
+#
 # Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,22 +20,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'connection'
-require_relative 'response'
+require 'async/http/response'
+require 'async/http/body/hijack'
 
 module Async
 	module WebSocket
-		class Server < HTTP::Middleware
-			def initialize(delegate)
-				super(delegate)
-			end
-			
-			def call(request)
-				if request.protocol == PROTOCOL
-					Response.new(request)
-				else
-					super
+		# The response from the server back to the client for negotiating HTTP/2 WebSockets.
+		class ConnectResponse < HTTP::Response
+			def initialize(request, headers = nil, protocol: nil, &block)
+				headers = headers&.dup || []
+				
+				if protocol
+					headers << ['sec-websocket-protocol', protocol]
 				end
+				
+				body = Async::HTTP::Body::Hijack.wrap(request, &block)
+				super(request.version, 200, nil, headers, body, PROTOCOL)
 			end
 		end
 	end

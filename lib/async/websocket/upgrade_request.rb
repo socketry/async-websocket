@@ -20,61 +20,48 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'request'
-
 require 'async/http/middleware'
-require 'async/http/body'
+require 'async/http/request'
+require 'protocol/http/headers'
+
+require 'securerandom'
+
+require_relative 'error'
 
 module Async
 	module WebSocket
-		PROTOCOL = "websocket".freeze
-		
-		# This is a basic synchronous websocket client:
-		class Client < HTTP::Middleware
-			def self.open(*args, &block)
-				client = self.new(HTTP::Client.new(*args))
+		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
+		class UpgradeRequest < HTTP::Request
+			def initialize(request, protocols: [], version: 13)
+				@accept_nounce = SecureRandom.base64(16)
 				
-				return client unless block_given?
+				headers = [
+					['sec-websocket-key', @accept_nounce],
+					['sec-websocket-version', version],
+				]
 				
-				begin
-					yield client
-				ensure
-					client.close
+				if protocols.any?
+					headers << ['sec-websocket-protocol', protocols.join(',')]
 				end
+				
+				merged_headers = ::Protocol::HTTP::Headers::Merged.new(request.headers, headers)
+				
+				super(request.scheme, request.authority, HTTP::GET, request.path, nil, merged_headers, nil, PROTOCOL)
 			end
 			
-			def make_connection(stream, headers)
-				protocol = headers['sec-websocket-protocol']&.first
+			def call(connection)
+				response = super
 				
-				
-				framer = Protocol::WebSocket::Framer.new(stream)
-				
-				return Connection.new(framer, protocol)
-			end
-			
-			def connect(path, headers = [])
-				request = Request.new(nil, nil, path, headers)
-				
-				response = self.call(request)
-				
-				unless Array(response.protocol).include?(PROTOCOL)
-					raise ProtocolError, "Unsupported protocol: #{response.protocol}"
+				if response.status == 101
+					accept_digest = response.headers['sec-websocket-accept'].first
+					expected_accept_digest = ::Protocol::WebSocket.accept_digest(@accept_nounce)
+					
+					unless accept_digest and accept_digest == expected_accept_digest
+						raise ProtocolError, "Invalid accept digest, expected #{expected_accept_digest.inspect}, got #{accept_digest.inspect}!"
+					end
 				end
 				
-				if response.hijack?
-					connection = make_connection(response.hijack!, response.headers)
-				else
-					stream = Async::HTTP::Body::Stream.new(response.body, request.body)
-					connection = make_connection(stream, response.headers)
-				end
-				
-				return connection unless block_given?
-				
-				begin
-					yield connection
-				ensure
-					connection.close
-				end
+				return response
 			end
 		end
 	end

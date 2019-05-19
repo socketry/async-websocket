@@ -1,4 +1,4 @@
-# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2017, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,22 +18,47 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'connection'
-require_relative 'response'
+require_relative 'connect_request'
+require_relative 'upgrade_request'
 
 module Async
 	module WebSocket
-		class Server < HTTP::Middleware
-			def initialize(delegate)
-				super(delegate)
+		class Request
+			def initialize(scheme = nil, authority = nil, path = nil, headers = [], **options)
+				@scheme = scheme
+				@authority = authority
+				@path = path
+				@headers = headers
+				
+				@options = options
+				
+				@body = nil
 			end
 			
-			def call(request)
-				if request.protocol == PROTOCOL
-					Response.new(request)
-				else
-					super
+			attr_accessor :scheme
+			attr_accessor :authority
+			attr_accessor :path
+			attr_accessor :headers
+			
+			attr_accessor :body
+			
+			# Send the request to the given connection.
+			def call(connection)
+				if connection.http1?
+					return UpgradeRequest.new(self, **@options).call(connection)
+				elsif connection.http2?
+					return ConnectRequest.new(self, **@options).call(connection)
 				end
+				
+				raise HTTP::Error, "Unsupported HTTP version: #{connection.version}!"
+			end
+			
+			def idempotent?
+				true
+			end
+			
+			def to_s
+				"\#<#{self.class} #{@scheme}://#{@authority}: #{@path}>"
 			end
 		end
 	end

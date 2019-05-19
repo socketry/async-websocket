@@ -1,9 +1,7 @@
 
 source "https://rubygems.org"
 
-gem "utopia", "~> 2.3.0"
-# gem "utopia-gallery"
-# gem "utopia-analytics"
+gem "utopia", "~> 2.9.0"
 
 gem "rake"
 gem "bundler"
