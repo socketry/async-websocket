@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 require 'protocol/websocket/connection'
+require 'protocol/websocket/headers'
 
 require 'json'
 

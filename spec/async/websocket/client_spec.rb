@@ -29,17 +29,19 @@ RSpec.describe Async::WebSocket::Client do
 		]}
 		
 		let(:client) {double}
+		let(:stream) {double}
+		
 		subject {described_class.new(client)}
-		let(:response) {Async::HTTP::Response.new(404)}
+		let(:response) {Async::HTTP::Response.new(nil, 101, "Switching Protocols", {}, nil, Protocol::WebSocket::Headers::PROTOCOL)}
 		
 		it "sets client request headers" do
+			expect(response).to receive(:stream).and_return(stream)
+			
 			expect(client).to receive(:call) do |request|
 				expect(request.headers.to_h).to include("Foo", "Baz")
-				
-				response
-			end
+			end.and_return(response)
 			
-			subject.connect("/server", headers)
+			subject.connect("/server", headers: headers)
 		end
 	end
 end
