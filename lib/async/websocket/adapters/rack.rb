@@ -20,13 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'protocol/websocket/digest'
-
 require_relative '../connection'
 
 module Async
 	module WebSocket
-		module Server
+		module Adapters
 			class Rack
 				def self.websocket?(env)
 					env['HTTP_UPGRADE'] == "websocket"

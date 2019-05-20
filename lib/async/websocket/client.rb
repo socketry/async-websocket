@@ -22,15 +22,17 @@
 
 require_relative 'request'
 
+require 'protocol/websocket/headers'
+
 require 'async/http/middleware'
 require 'async/http/body'
 
 module Async
 	module WebSocket
-		PROTOCOL = "websocket".freeze
-		
 		# This is a basic synchronous websocket client:
 		class Client < HTTP::Middleware
+			include ::Protocol::WebSocket::Headers
+			
 			def self.open(*args, &block)
 				client = self.new(HTTP::Client.new(*args))
 				
@@ -43,17 +45,8 @@ module Async
 				end
 			end
 			
-			def make_connection(stream, headers)
-				protocol = headers['sec-websocket-protocol']&.first
-				
-				
-				framer = Protocol::WebSocket::Framer.new(stream)
-				
-				return Connection.new(framer, protocol)
-			end
-			
-			def connect(path, headers = [])
-				request = Request.new(nil, nil, path, headers)
+			def connect(path, headers: [], handler: Connection, **options)
+				request = Request.new(nil, nil, path, headers, **options)
 				
 				response = self.call(request)
 				
@@ -61,12 +54,9 @@ module Async
 					raise ProtocolError, "Unsupported protocol: #{response.protocol}"
 				end
 				
-				if response.hijack?
-					connection = make_connection(response.hijack!, response.headers)
-				else
-					stream = Async::HTTP::Body::Stream.new(response.body, request.body)
-					connection = make_connection(stream, response.headers)
-				end
+				protocol = response.headers[SEC_WEBSOCKET_PROTOCOL]&.first
+				framer = Protocol::WebSocket::Framer.new(response.stream)
+				connection = handler.call(framer, protocol)
 				
 				return connection unless block_given?
 				

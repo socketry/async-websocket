@@ -27,11 +27,13 @@ module Async
 	module WebSocket
 		# The response from the server back to the client for negotiating HTTP/2 WebSockets.
 		class ConnectResponse < HTTP::Response
+			include ::Protocol::WebSocket::Headers
+			
 			def initialize(request, headers = nil, protocol: nil, &block)
 				headers = headers&.dup || []
 				
 				if protocol
-					headers << ['sec-websocket-protocol', protocol]
+					headers << [SEC_WEBSOCKET_PROTOCOL, protocol]
 				end
 				
 				body = Async::HTTP::Body::Hijack.wrap(request, &block)

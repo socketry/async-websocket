@@ -21,5 +21,3 @@
 require_relative 'websocket/version'
 require_relative 'websocket/server'
 require_relative 'websocket/client'
-
-require 'async/io'

@@ -22,7 +22,9 @@
 
 require 'async/http/middleware'
 require 'async/http/request'
+
 require 'protocol/http/headers'
+require 'protocol/websocket/headers'
 
 require 'securerandom'
 
@@ -32,16 +34,53 @@ module Async
 	module WebSocket
 		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
 		class UpgradeRequest < HTTP::Request
+			include ::Protocol::WebSocket::Headers
+			
+			class Wrapper
+				def initialize(response)
+					@response = response
+					@stream = nil
+				end
+				
+				def stream?
+					@status == 101
+				end
+				
+				def status
+					@response.status
+				end
+				
+				def headers
+					@response.headers
+				end
+				
+				def body?
+					false
+				end
+				
+				def body
+					nil
+				end
+				
+				def protocol
+					@response.protocol
+				end
+				
+				def stream
+					@stream ||= @response.hijack!
+				end
+			end
+			
 			def initialize(request, protocols: [], version: 13)
-				@accept_nounce = SecureRandom.base64(16)
+				@key = Nounce.generate_key
 				
 				headers = [
-					['sec-websocket-key', @accept_nounce],
-					['sec-websocket-version', version],
+					[SEC_WEBSOCKET_KEY, @key],
+					[SEC_WEBSOCKET_VERSION, version],
 				]
 				
 				if protocols.any?
-					headers << ['sec-websocket-protocol', protocols.join(',')]
+					headers << [SEC_WEBSOCKET_PROTOCOL, protocols.join(',')]
 				end
 				
 				merged_headers = ::Protocol::HTTP::Headers::Merged.new(request.headers, headers)
@@ -52,16 +91,15 @@ module Async
 			def call(connection)
 				response = super
 				
-				if response.status == 101
-					accept_digest = response.headers['sec-websocket-accept'].first
-					expected_accept_digest = ::Protocol::WebSocket.accept_digest(@accept_nounce)
+				if accept_digest = response.headers[SEC_WEBSOCKET_ACCEPT]&.first
+					expected_accept_digest = Nounce.accept_digest(@key)
 					
 					unless accept_digest and accept_digest == expected_accept_digest
 						raise ProtocolError, "Invalid accept digest, expected #{expected_accept_digest.inspect}, got #{accept_digest.inspect}!"
 					end
 				end
 				
-				return response
+				return Wrapper.new(response)
 			end
 		end
 	end

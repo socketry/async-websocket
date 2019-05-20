@@ -21,6 +21,8 @@
 require_relative 'connection'
 require_relative 'response'
 
+require 'async/http/middleware'
+
 module Async
 	module WebSocket
 		class Server < HTTP::Middleware

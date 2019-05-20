@@ -20,14 +20,14 @@
 
 require 'async/websocket'
 require 'async/websocket/client'
-require 'async/websocket/server/rack'
+require 'async/websocket/adapters/rack'
 
 require 'rack/test'
 require 'falcon/server'
 require 'falcon/adapters/rack'
 require 'async/http/endpoint'
 
-RSpec.describe Async::WebSocket::Server::Rack do
+RSpec.describe Async::WebSocket::Adapters::Rack do
 	include_context Async::RSpec::Reactor
 	
 	let(:endpoint) {Async::HTTP::Endpoint.parse("http://localhost:7050")}

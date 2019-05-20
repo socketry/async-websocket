@@ -26,10 +26,6 @@ require_relative 'error'
 module Async
 	module WebSocket
 		module Response
-			def self.websocket?(request)
-				request.protocol == PROTOCOL
-			end
-			
 			# Send the request to the given connection.
 			def self.for(request, headers = [], **options, &body)
 				if request.version =~ /http\/1/i

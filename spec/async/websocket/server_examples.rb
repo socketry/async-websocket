@@ -51,11 +51,13 @@ RSpec.shared_context Async::WebSocket::Server do
 	
 	let(:server) do
 		Async::HTTP::Server.for(endpoint, protocol) do |request|
-			if Array(request.protocol).include?(Async::WebSocket::PROTOCOL)
+			if Async::WebSocket::Request.websocket?(request)
 				Async::WebSocket::Response.for(request, headers) do |stream|
 					framer = Protocol::WebSocket::Framer.new(stream)
 					
-					handler.call(request, framer)
+					connection = handler.call(framer)
+					
+					connection.close
 				end
 			else
 				Async::HTTP::Response[404, {}, []]

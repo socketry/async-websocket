@@ -22,8 +22,7 @@
 
 require 'async/http/response'
 require 'async/http/body/hijack'
-
-require 'protocol/websocket/digest'
+require 'protocol/websocket/headers'
 
 module Async
 	module WebSocket
@@ -31,18 +30,20 @@ module Async
 		
 		# The response from the server back to the client for negotiating HTTP/1.x WebSockets.
 		class UpgradeResponse < HTTP::Response
+			include ::Protocol::WebSocket::Headers
+			
 			def initialize(request, headers = nil, protocol: nil, &block)
 				headers = headers&.dup || []
 				
-				if accept_nounce = request.headers['sec-websocket-key']&.first
-					headers << ['sec-websocket-accept', ::Protocol::WebSocket.accept_digest(accept_nounce)]
+				if accept_nounce = request.headers[SEC_WEBSOCKET_KEY]&.first
+					headers << [SEC_WEBSOCKET_ACCEPT, Nounce.accept_digest(accept_nounce)]
 					status = 101
 				else
 					status = 400
 				end
 				
 				if protocol
-					headers << ['sec-websocket-protocol', protocol]
+					headers << [SEC_WEBSOCKET_PROTOCOL, protocol]
 				end
 				
 				body = Async::HTTP::Body::Hijack.wrap(request, &block)

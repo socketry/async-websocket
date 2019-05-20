@@ -24,6 +24,12 @@ require_relative 'upgrade_request'
 module Async
 	module WebSocket
 		class Request
+			include ::Protocol::WebSocket::Headers
+			
+			def self.websocket?(request)
+				Array(request.protocol).include?(PROTOCOL)
+			end
+			
 			def initialize(scheme = nil, authority = nil, path = nil, headers = [], **options)
 				@scheme = scheme
 				@authority = authority

@@ -23,26 +23,67 @@
 require 'async/http/middleware'
 require 'async/http/request'
 require 'protocol/http/headers'
+require 'protocol/websocket/headers'
 
 module Async
 	module WebSocket
 		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
 		# See https://tools.ietf.org/html/rfc8441 for more details.
 		class ConnectRequest < HTTP::Request
+			include ::Protocol::WebSocket::Headers
+			
+			class Wrapper
+				def initialize(body, response)
+					@body = body
+					@response = response
+					@stream = nil
+				end
+				
+				def stream?
+					success?
+				end
+				
+				def status
+					@response.status
+				end
+				
+				def headers
+					@response.headers
+				end
+				
+				def body?
+					true
+				end
+				
+				attr_accessor :body
+				
+				def protocol
+					@response.protocol
+				end
+				
+				def stream
+					@stream ||= Async::HTTP::Body::Stream.new(@response.body, @body)
+				end
+			end
+			
 			def initialize(request, protocols: [], version: 13)
-				request.body ||= Async::HTTP::Body::Writable.new
+				body = Async::HTTP::Body::Writable.new
 				
 				headers = []
 				
-				headers << ['sec-websocket-version', version]
+				headers << [SEC_WEBSOCKET_VERSION, version]
 				
 				if protocols.any?
-					headers << ['sec-websocket-protocol', protocols.join(',')]
+					headers << [SEC_WEBSOCKET_PROTOCOL, protocols.join(',')]
 				end
 				
 				merged_headers = ::Protocol::HTTP::Headers::Merged.new(request.headers, headers)
 				
-				super(request.scheme, request.authority, HTTP::CONNECT, request.path, nil, merged_headers, request.body, PROTOCOL)
+				super(request.scheme, request.authority, HTTP::CONNECT, request.path, nil, merged_headers, body, PROTOCOL)
+			end
+			
+			def call(connection)
+				Wrapper.new(@body, super)
 			end
 		end
 	end
