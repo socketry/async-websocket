@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 require_relative '../connection'
+require_relative '../response'
 
 module Async
 	module WebSocket

@@ -58,10 +58,10 @@ class Command < Samovar::Command
 				# subtask.children.each(&:stop)
 			end
 			
-			client = Async::WebSocket::Client.new(endpoint)
+			client = Async::WebSocket::Client.open(endpoint)
 			
 			count.times do |i|
-				connections.enqueue(client.get)
+				connections.enqueue(client.connect(endpoint.path))
 				progress.advance(1)
 			end
 			

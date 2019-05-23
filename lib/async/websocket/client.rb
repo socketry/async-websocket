@@ -21,10 +21,12 @@
 # THE SOFTWARE.
 
 require_relative 'request'
+require_relative 'connection'
 
 require 'protocol/websocket/headers'
-
 require 'protocol/http/middleware'
+
+require 'async/http/client'
 
 module Async
 	module WebSocket

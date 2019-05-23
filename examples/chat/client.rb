@@ -14,7 +14,7 @@ Async do |task|
 		Async::IO::Generic.new($stdin)
 	)
 	
-	Async::WebSocket::Client.open(ENDPOINT) do |connection|
+	Async::WebSocket::Client.connect(ENDPOINT) do |connection|
 		input_task = task.async do
 			while line = stdin.read_until("\n")
 				connection.write({text: line})
