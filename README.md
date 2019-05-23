@@ -1,6 +1,6 @@
 # Async::WebSocket
 
-A simple asynchronous websocket client/server implementation.
+A simple asynchronous websocket client/server implementation for [HTTP/1](https://tools.ietf.org/html/rfc6455) and [HTTP/2](https://tools.ietf.org/html/rfc8441).
 
 [![Build Status](https://secure.travis-ci.org/socketry/async-websocket.svg)](http://travis-ci.org/socketry/async-websocket)
 [![Code Climate](https://codeclimate.com/github/socketry/async-websocket.svg)](https://codeclimate.com/github/socketry/async-websocket)
