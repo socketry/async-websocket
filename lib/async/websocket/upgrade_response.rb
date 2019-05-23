@@ -20,14 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/http/response'
 require 'async/http/body/hijack'
+require 'protocol/http/response'
 require 'protocol/websocket/headers'
 
 module Async
 	module WebSocket
 		# The response from the server back to the client for negotiating HTTP/1.x WebSockets.
-		class UpgradeResponse < HTTP::Response
+		class UpgradeResponse < ::Protocol::HTTP::Response
 			include ::Protocol::WebSocket::Headers
 			
 			def initialize(request, headers = nil, protocol: nil, &block)

@@ -20,8 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/http/middleware'
-require 'async/http/request'
+require 'protocol/http/request'
 require 'protocol/http/headers'
 require 'protocol/websocket/headers'
 
@@ -29,7 +28,7 @@ module Async
 	module WebSocket
 		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
 		# See https://tools.ietf.org/html/rfc8441 for more details.
-		class ConnectRequest < HTTP::Request
+		class ConnectRequest < ::Protocol::HTTP::Request
 			include ::Protocol::WebSocket::Headers
 			
 			class Wrapper
@@ -79,7 +78,7 @@ module Async
 				
 				merged_headers = ::Protocol::HTTP::Headers::Merged.new(request.headers, headers)
 				
-				super(request.scheme, request.authority, HTTP::CONNECT, request.path, nil, merged_headers, body, PROTOCOL)
+				super(request.scheme, request.authority, ::Protocol::HTTP::Methods::CONNECT, request.path, nil, merged_headers, body, PROTOCOL)
 			end
 			
 			def call(connection)

@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/http/middleware'
-require 'async/http/request'
+require 'protocol/http/middleware'
+require 'protocol/http/request'
 
 require 'protocol/http/headers'
 require 'protocol/websocket/headers'
@@ -33,7 +33,7 @@ require_relative 'error'
 module Async
 	module WebSocket
 		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
-		class UpgradeRequest < HTTP::Request
+		class UpgradeRequest < ::Protocol::HTTP::Request
 			include ::Protocol::WebSocket::Headers
 			
 			class Wrapper
@@ -85,7 +85,7 @@ module Async
 				
 				merged_headers = ::Protocol::HTTP::Headers::Merged.new(request.headers, headers)
 				
-				super(request.scheme, request.authority, HTTP::GET, request.path, nil, merged_headers, nil, PROTOCOL)
+				super(request.scheme, request.authority, ::Protocol::HTTP::Methods::GET, request.path, nil, merged_headers, nil, PROTOCOL)
 			end
 			
 			def call(connection)

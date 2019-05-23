@@ -24,13 +24,12 @@ require_relative 'request'
 
 require 'protocol/websocket/headers'
 
-require 'async/http/middleware'
-require 'async/http/body'
+require 'protocol/http/middleware'
 
 module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
-		class Client < HTTP::Middleware
+		class Client < ::Protocol::HTTP::Middleware
 			include ::Protocol::WebSocket::Headers
 			
 			def self.open(endpoint, *args, &block)

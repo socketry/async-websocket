@@ -21,11 +21,11 @@
 require_relative 'connection'
 require_relative 'response'
 
-require 'async/http/middleware'
+require 'protocol/http/middleware'
 
 module Async
 	module WebSocket
-		class Server < HTTP::Middleware
+		class Server < ::Protocol::HTTP::Middleware
 			include ::Protocol::WebSocket::Headers
 			
 			def initialize(delegate, protocols: [], handler: Connection)
