@@ -30,14 +30,14 @@ module Async
 			include ::Protocol::WebSocket::Headers
 			
 			def initialize(request, headers = nil, protocol: nil, &block)
-				headers = headers&.dup || []
+				headers = Protocol::HTTP::Headers::Merged.new(headers)
 				
 				if protocol
-					headers << [SEC_WEBSOCKET_PROTOCOL, protocol]
+					headers << [[SEC_WEBSOCKET_PROTOCOL, protocol]]
 				end
 				
 				body = Async::HTTP::Body::Hijack.wrap(request, &block)
-				super(request.version, 200, nil, headers, body, PROTOCOL)
+				super(request.version, 200, nil, headers, body)
 			end
 		end
 	end

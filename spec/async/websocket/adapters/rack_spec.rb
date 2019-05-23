@@ -47,6 +47,7 @@ RSpec.describe Async::WebSocket::Adapters::Rack do
 	
 	it "can make non-websocket connection to server" do
 		response = client.get("/")
+		
 		expect(response).to be_success
 		expect(response.read).to be == "Hello World"
 		
@@ -58,7 +59,7 @@ RSpec.describe Async::WebSocket::Adapters::Rack do
 	end
 	
 	it "can make websocket connection to server" do
-		Async::WebSocket::Client.open(endpoint) do |connection|
+		Async::WebSocket::Client.connect(endpoint) do |connection|
 			connection.write(message)
 			
 			expect(connection.read).to be == message
@@ -70,13 +71,13 @@ RSpec.describe Async::WebSocket::Adapters::Rack do
 	it "should use mask over insecure connection" do
 		expect(endpoint).to_not be_secure
 		
-		Async::WebSocket::Client.open(endpoint) do |connection|
+		Async::WebSocket::Client.connect(endpoint) do |connection|
 			expect(connection.mask).to_not be_nil
 		end
 	end
 	
 	it "should negotiate protocol" do
-		Async::WebSocket::Client.open(endpoint, protocols: ['ws']) do |connection|
+		Async::WebSocket::Client.connect(endpoint, protocols: ['ws']) do |connection|
 			expect(connection.protocol).to be == 'ws'
 		end
 	end

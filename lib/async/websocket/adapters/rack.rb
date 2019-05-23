@@ -25,74 +25,36 @@ require_relative '../connection'
 module Async
 	module WebSocket
 		module Adapters
-			class Rack
+			module Rack
+				include ::Protocol::WebSocket::Headers
+				
 				def self.websocket?(env)
-					env['HTTP_UPGRADE'] == "websocket"
+					request = env['async.http.request'] and Array(request.protocol).include?(PROTOCOL)
 				end
 				
-				def self.open(env, **options, &block)
-					# Is hijack supported:
-					return nil unless env['rack.hijack?']
-					
-					return nil unless websocket?(env)
-					
-					server = self.new(env, **options)
-					
-					if server.supported?
-						return server.response(&block)
-					else
-						return nil
+				def self.open(env, headers: [], protocols: [], handler: Connection, **options, &block)
+					if request = env['async.http.request'] and Array(request.protocol).include?(PROTOCOL)
+						# Select websocket sub-protocol:
+						if requested_protocol = request.headers[SEC_WEBSOCKET_PROTOCOL]
+							protocol = (requested_protocol & protocols).first
+						end
+						
+						response = Response.for(request, headers, protocol: protocol, **options) do |stream|
+							framer = Protocol::WebSocket::Framer.new(stream)
+							
+							yield handler.call(framer, protocol)
+						end
+						
+						headers = response.headers
+						
+						if protocol = response.protocol
+							headers = Protocol::HTTP::Headers::Merged.new(headers, [
+								['rack.protocol', protocol]
+							])
+						end
+						
+						return [response.status, headers, response.body]
 					end
-				end
-				
-				def initialize(env, supported_protocols: [], connect: Connection)
-					# scheme = env['rack.url_scheme'] == 'https' ? 'wss' : 'ws'
-					# @url = "#{scheme}://#{env['HTTP_HOST']}#{env['REQUEST_URI']}"
-					@key = env['HTTP_SEC_WEBSOCKET_KEY']
-					@version = Integer(env['HTTP_SEC_WEBSOCKET_VERSION'])
-					
-					@protocol = negotiate_protocol(env, supported_protocols)
-					
-					@connect = connect
-				end
-				
-				def negotiate_protocol(env, supported_protocols)
-					if supported_protocols and client_protocols = env['HTTP_SEC_WEBSOCKET_PROTOCOL']
-						return (supported_protocols & client_protocols.split(/\s*,\s/)).first
-					end
-				end
-				
-				attr :protocol
-				
-				def supported?
-					@key and @version == 13
-				end
-				
-				def make_connection(stream)
-					framer = Protocol::WebSocket::Framer.new(stream)
-					
-					return @connect.call(framer, @protocol)
-				end
-				
-				def response_headers
-					headers = [
-						['Sec-WebSocket-Accept', ::Protocol::WebSocket.accept_digest(@key)],
-					]
-					
-					if @protocol
-						headers << ['Sec-WebSocket-Protocol', @protocol]
-					end
-					
-					return headers
-				end
-				
-				def response(&block)
-					headers = [
-						['rack.hijack', ->(stream){block.call(make_connection(stream))}]
-					]
-					
-					# https://stackoverflow.com/questions/13545453/http-response-code-when-requested-websocket-subprotocol-isnt-supported-recogniz
-					return [101, response_headers + headers, nil]
 				end
 			end
 		end

@@ -60,7 +60,7 @@ RSpec.shared_context Async::WebSocket::Server do
 					connection.close
 				end
 			else
-				Async::HTTP::Response[404, {}, []]
+				Protocol::HTTP::Response[404, {}, []]
 			end
 		end
 	end

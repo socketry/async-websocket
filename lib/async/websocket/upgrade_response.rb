@@ -26,28 +26,26 @@ require 'protocol/websocket/headers'
 
 module Async
 	module WebSocket
-		SWITCHING_PROTOCOLS = "Switching Protocols".freeze
-		
 		# The response from the server back to the client for negotiating HTTP/1.x WebSockets.
 		class UpgradeResponse < HTTP::Response
 			include ::Protocol::WebSocket::Headers
 			
 			def initialize(request, headers = nil, protocol: nil, &block)
-				headers = headers&.dup || []
+				headers = Protocol::HTTP::Headers::Merged.new(headers)
 				
 				if accept_nounce = request.headers[SEC_WEBSOCKET_KEY]&.first
-					headers << [SEC_WEBSOCKET_ACCEPT, Nounce.accept_digest(accept_nounce)]
+					headers << [[SEC_WEBSOCKET_ACCEPT, Nounce.accept_digest(accept_nounce)]]
 					status = 101
 				else
 					status = 400
 				end
 				
 				if protocol
-					headers << [SEC_WEBSOCKET_PROTOCOL, protocol]
+					headers << [[SEC_WEBSOCKET_PROTOCOL, protocol]]
 				end
 				
 				body = Async::HTTP::Body::Hijack.wrap(request, &block)
-				super(request.version, status, SWITCHING_PROTOCOLS, headers, body, PROTOCOL)
+				super(request.version, status, nil, headers, body, PROTOCOL)
 			end
 		end
 	end

@@ -43,7 +43,7 @@ module Async
 				end
 				
 				def stream?
-					@status == 101
+					@response.status == 101
 				end
 				
 				def status

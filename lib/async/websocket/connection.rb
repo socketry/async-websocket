@@ -31,8 +31,8 @@ module Async
 		class Connection < ::Protocol::WebSocket::Connection
 			include ::Protocol::WebSocket::Headers
 			
-			def self.call(framer, protocol = nil)
-				return self.new(framer, protocol)
+			def self.call(framer, protocol = [], **options)
+				return self.new(framer, Array(protocol).first, **options)
 			end
 			
 			def initialize(framer, protocol = nil, **options)

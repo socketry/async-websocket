@@ -40,7 +40,7 @@ module Async
 				end
 				
 				def stream?
-					success?
+					@response.success?
 				end
 				
 				def status

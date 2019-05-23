@@ -33,8 +33,8 @@ module Async
 		class Client < HTTP::Middleware
 			include ::Protocol::WebSocket::Headers
 			
-			def self.open(*args, &block)
-				client = self.new(HTTP::Client.new(*args))
+			def self.open(endpoint, *args, &block)
+				client = self.new(HTTP::Client.new(endpoint, *args), mask: endpoint.secure?)
 				
 				return client unless block_given?
 				
@@ -45,18 +45,39 @@ module Async
 				end
 			end
 			
+			def self.connect(endpoint, *args, protocols: [], **options, &block)
+				self.open(endpoint, *args, **options) do |client|
+					connection = client.connect(endpoint.path, protocols: protocols)
+					
+					return connection unless block_given?
+					
+					begin
+						yield connection
+					ensure
+						connection.close
+					end
+				end
+			end
+			
+			def initialize(delegate, **options)
+				super(delegate)
+				
+				@options = options
+			end
+			
 			def connect(path, headers: [], handler: Connection, **options)
 				request = Request.new(nil, nil, path, headers, **options)
 				
 				response = self.call(request)
 				
-				unless Array(response.protocol).include?(PROTOCOL)
-					raise ProtocolError, "Unsupported protocol: #{response.protocol}"
+				unless response.stream?
+					raise ProtocolError, "Failed to negotiate connection: #{response.status}"
 				end
 				
 				protocol = response.headers[SEC_WEBSOCKET_PROTOCOL]&.first
 				framer = Protocol::WebSocket::Framer.new(response.stream)
-				connection = handler.call(framer, protocol)
+				
+				connection = handler.call(framer, protocol, **@options)
 				
 				return connection unless block_given?
 				
