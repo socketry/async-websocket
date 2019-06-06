@@ -32,7 +32,7 @@ RSpec.describe Async::WebSocket::Client do
 		let(:stream) {double}
 		
 		subject {described_class.new(client)}
-		let(:response) {Protocol::HTTP::Response.new(nil, 101, "Switching Protocols", {}, nil, Protocol::WebSocket::Headers::PROTOCOL)}
+		let(:response) {Protocol::HTTP::Response.new(nil, 101, {}, nil, Protocol::WebSocket::Headers::PROTOCOL)}
 		
 		it "sets client request headers" do
 			expect(response).to receive(:stream?).and_return(true)

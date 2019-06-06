@@ -37,7 +37,7 @@ module Async
 				end
 				
 				body = Async::HTTP::Body::Hijack.wrap(request, &block)
-				super(request.version, 200, nil, headers, body)
+				super(request.version, 200, headers, body)
 			end
 		end
 	end
