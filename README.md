@@ -75,13 +75,13 @@ end
 ```ruby
 #!/usr/bin/env -S falcon serve --bind http://localhost:7070 --count 1 -c
 
-require 'async/websocket/server/rack'
+require 'async/websocket/adapters/rack'
 require 'set'
 
 $connections = Set.new
 
 run lambda {|env|
-	Async::WebSocket::Server::Rack.open(env, protocols: ['ws']) do |connection|
+	Async::WebSocket::Adapters::Rack.open(env, protocols: ['ws']) do |connection|
 		$connections << connection
 		
 		while message = connection.read

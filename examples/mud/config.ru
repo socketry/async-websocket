@@ -1,6 +1,6 @@
 #!/usr/bin/env falcon serve --count 1 --bind http://127.0.0.1:7070 -c
 
-require 'async/websocket/server/rack'
+require 'async/websocket/adapters/rack'
 
 class Room
 	def initialize(name, description = nil)
@@ -124,7 +124,7 @@ class Server
 	end
 	
 	def call(env)
-		Async::WebSocket::Server::Rack.open(env, connect: User) do |user|
+		Async::WebSocket::Adapters::Rack.open(env, connect: User) do |user|
 			@entrance.enter(user)
 			
 			while message = user.read

@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/websocket/server/rack'
+require 'async/websocket/adapters/rack'
 
 class Upgrade
 	def initialize(app)
@@ -26,7 +26,7 @@ class Upgrade
 	end
 	
 	def call(env)
-		Async::WebSocket::Server::Rack.open(env, supported_protocols: ['ws']) do |connection|
+		Async::WebSocket::Adapters::Rack.open(env, supported_protocols: ['ws']) do |connection|
 			read, write = IO.pipe
 			
 			Process.spawn("ls -lah", :out => write)
