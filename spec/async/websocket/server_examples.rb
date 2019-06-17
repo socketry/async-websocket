@@ -71,7 +71,6 @@ RSpec.shared_context Async::WebSocket::Server do
 		expect(connection.read).to be_nil
 		expect(connection).to be_closed
 		
-		Async.logger.debug(connection, "Closing connection...")
 		connection.close
 	end
 end
