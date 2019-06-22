@@ -46,9 +46,9 @@ module Async
 				end
 			end
 			
-			def self.connect(endpoint, *args, protocols: [], **options, &block)
-				self.open(endpoint, *args, **options) do |client|
-					connection = client.connect(endpoint.path, protocols: protocols)
+			def self.connect(endpoint, *args, **options, &block)
+				self.open(endpoint, *args) do |client|
+					connection = client.connect(endpoint.path, **options)
 					
 					return connection unless block_given?
 					
