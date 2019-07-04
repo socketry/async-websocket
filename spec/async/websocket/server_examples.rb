@@ -29,7 +29,7 @@ RSpec.shared_context Async::WebSocket::Server do
 	include_context Async::RSpec::Reactor
 	
 	let(:protocol) {described_class}
-	let(:endpoint) {Async::HTTP::Endpoint.parse('http://127.0.0.1:8008', reuse_port: true)}
+	let(:endpoint) {Async::HTTP::Endpoint.parse('http://127.0.0.1:8008')}
 	
 	let!(:client) {Async::WebSocket::Client.open(endpoint, protocol)}
 	
@@ -49,6 +49,8 @@ RSpec.shared_context Async::WebSocket::Server do
 	let(:handler) {Async::WebSocket::Connection}
 	let(:headers) {Array.new}
 	
+	let(:message) {["Hello World"]}
+	
 	let(:server) do
 		Async::HTTP::Server.for(endpoint, protocol) do |request|
 			if Async::WebSocket::Request.websocket?(request)
@@ -56,6 +58,8 @@ RSpec.shared_context Async::WebSocket::Server do
 					framer = Protocol::WebSocket::Framer.new(stream)
 					
 					connection = handler.call(framer)
+					
+					connection.write(message)
 					
 					connection.close
 				end
@@ -68,6 +72,7 @@ RSpec.shared_context Async::WebSocket::Server do
 	it "can establish connection" do
 		connection = client.connect("/server")
 		
+		expect(connection.read).to be == message
 		expect(connection.read).to be_nil
 		expect(connection).to be_closed
 		
