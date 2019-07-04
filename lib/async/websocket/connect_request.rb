@@ -34,11 +34,14 @@ module Async
 			include ::Protocol::WebSocket::Headers
 			
 			class Wrapper
-				def initialize(body, response)
-					@body = body
+				def initialize(output, response)
+					@output = output
+					@body = output
 					@response = response
 					@stream = nil
 				end
+				
+				attr_accessor :body
 				
 				def stream?
 					@response.success?
@@ -56,14 +59,12 @@ module Async
 					true
 				end
 				
-				attr_accessor :body
-				
 				def protocol
 					@response.protocol
 				end
 				
 				def stream
-					@stream ||= Async::HTTP::Body::Stream.new(@response.body, @body)
+					@stream ||= Async::HTTP::Body::Stream.new(@response.body, @output)
 				end
 			end
 			
@@ -84,7 +85,7 @@ module Async
 			end
 			
 			def call(connection)
-				Wrapper.new(@body, super)
+				Wrapper.new(body, super)
 			end
 		end
 	end
