@@ -6,7 +6,7 @@ require 'async/http/endpoint'
 require_relative '../../lib/async/websocket/client'
 
 USER = ARGV.pop || "anonymous"
-URL = ARGV.pop || "http://127.0.0.1:8080"
+URL = ARGV.pop || "https://localhost:8080"
 ENDPOINT = Async::HTTP::Endpoint.parse(URL)
 
 Async do |task|

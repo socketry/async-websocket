@@ -18,7 +18,7 @@ class Command < Samovar::Command
 	options do
 		option "-c/--count <integer>", "The total number of connections to make.", default: 1000, type: Integer
 		option "--bind <address>", "The local address to bind to before making a connection."
-		option "--connect <string>", "The remote server to connect to.", default: "http://127.0.0.1:8080"
+		option "--connect <string>", "The remote server to connect to.", default: "https://localhost:8080"
 		
 		option "-s/--semaphore <integer>", "The number of simultaneous connections to perform."
 	end
