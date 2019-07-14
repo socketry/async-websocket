@@ -1,4 +1,4 @@
-#!/usr/bin/env -S falcon serve --bind https://localhost:8080 --count 1 -c
+#!/usr/bin/env -S falcon serve --bind https://localhost:8080 --count 1 --timeout 12000 -c
 
 require_relative '../../lib/async/websocket/adapters/rack'
 require 'async/clock'
@@ -13,10 +13,19 @@ class Room
 	def initialize
 		@connections = Set.new
 		@semaphore = Async::Semaphore.new(512)
+		
+		@count = 0
 	end
 	
 	def connect connection
 		@connections << connection
+		
+		@count += 1
+		
+		if (@count % 1000).zero?
+			duration = Async::Clock.measure{GC.start(full_mark: false, immediate_sweep: false)}
+			Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
+		end
 	end
 	
 	def disconnect connection

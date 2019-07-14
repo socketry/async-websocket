@@ -63,6 +63,11 @@ class Command < Samovar::Command
 			count.times do |i|
 				connections.enqueue(client.connect(endpoint.path))
 				progress.advance(1)
+				
+				if (i % 1000).zero?
+					duration = Async::Clock.measure{GC.start(full_mark: false, immediate_sweep: false)}
+					Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
+				end
 			end
 			
 			connections.enqueue(nil)
