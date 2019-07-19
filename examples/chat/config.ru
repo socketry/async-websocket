@@ -22,8 +22,9 @@ class Room
 		
 		@count += 1
 		
-		if (@count % 1000).zero?
-			duration = Async::Clock.measure{GC.start(full_mark: false, immediate_sweep: false)}
+		if (@count % 10000).zero?
+			# (full_mark: false, immediate_sweep: false)
+			duration = Async::Clock.measure{GC.start}
 			Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
 		end
 	end

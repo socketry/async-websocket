@@ -8,7 +8,6 @@ require 'async/http/endpoint'
 require_relative '../../lib/async/websocket/client'
 
 require 'samovar'
-require 'ruby-prof'
 
 require 'tty/progressbar'
 
@@ -36,9 +35,6 @@ class Command < Samovar::Command
 		connections = Async::Queue.new
 		progress = TTY::ProgressBar.new(":rate connection/s [:bar] :current/:total (:eta/:elapsed)", total: count)
 		
-		# profile = RubyProf::Profile.new(merge_fibers: true)
-		# profile.start
-		
 		Async do |task|
 			task.logger.info!
 			
@@ -55,7 +51,7 @@ class Command < Samovar::Command
 					end
 				end
 				
-				# subtask.children.each(&:stop)
+				GC.start
 			end
 			
 			client = Async::WebSocket::Client.open(endpoint)
@@ -64,16 +60,18 @@ class Command < Samovar::Command
 				connections.enqueue(client.connect(endpoint.path))
 				progress.advance(1)
 				
-				if (i % 1000).zero?
+				if (i % 10000).zero?
 					duration = Async::Clock.measure{GC.start(full_mark: false, immediate_sweep: false)}
 					Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
 				end
 			end
 			
 			connections.enqueue(nil)
+			
+			Async.logger.info(self) {"Exiting top level connection loop..."}
 		end
-	
-	# ensure
+	ensure
+		# client.close
 	# 	result = profile.stop
 	# 	printer = RubyProf::FlatPrinter.new(result)
 	# 	printer.print(STDOUT, min_percent: 0.5)
