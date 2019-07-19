@@ -34,6 +34,16 @@ Async::HTTP::Protocol::HTTP2::Stream::Output: 10001 allocations
 
 ## System Limits
 
+### Fiber Performance
+
+To improve fiber performance:
+
+	export RUBY_FIBER_VM_STACK_SIZE=0
+	export RUBY_FIBER_MACHINE_STACK_SIZE=0
+	export RUBY_SHARED_FIBER_POOL_FREE_STACKS=0
+
+`RUBY_SHARED_FIBER_POOL_FREE_STACKS` is an experimental feature on `ruby-head`.
+
 ### FiberError: can't set a guard page: Cannot allocate memory
 
 This error occurs because the operating system has limited resources for allocating fiber stacks.

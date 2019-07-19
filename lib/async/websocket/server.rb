@@ -49,6 +49,8 @@ module Async
 					# Select websocket sub-protocol:
 					protocol = select_protocol(request)
 					
+					# request.headers = nil
+					
 					Response.for(request, headers, protocol: protocol, **options) do |stream|
 						framer = Protocol::WebSocket::Framer.new(stream)
 						

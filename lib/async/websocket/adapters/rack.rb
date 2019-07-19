@@ -35,12 +35,16 @@ module Async
 				
 				def self.open(env, headers: [], protocols: [], handler: Connection, **options, &block)
 					if request = env['async.http.request'] and Array(request.protocol).include?(PROTOCOL)
+						env = nil
+						
 						# Select websocket sub-protocol:
 						if requested_protocol = request.headers[SEC_WEBSOCKET_PROTOCOL]
 							protocol = (requested_protocol & protocols).first
 						end
 						
 						response = Response.for(request, headers, protocol: protocol, **options) do |stream|
+							# response.headers = nil
+							
 							framer = Protocol::WebSocket::Framer.new(stream)
 							
 							connection = handler.call(framer, protocol)
@@ -49,6 +53,7 @@ module Async
 							connection.close unless connection.closed?
 						end
 						
+						requst = nil
 						headers = response.headers
 						
 						if protocol = response.protocol
