@@ -30,6 +30,8 @@ class Command < Samovar::Command
 	
 	def call
 		endpoint = Async::HTTP::Endpoint.parse(@options[:connect], local_address: self.local_address)
+		endpoint = endpoint.each.first
+		
 		count = @options[:count]
 		
 		connections = Async::Queue.new
