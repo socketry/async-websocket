@@ -43,17 +43,18 @@ module Async
 						end
 						
 						response = Response.for(request, headers, protocol: protocol, **options) do |stream|
-							# response.headers = nil
+							response = nil
 							
 							framer = Protocol::WebSocket::Framer.new(stream)
 							
 							connection = handler.call(framer, protocol)
+							
 							yield connection
 							
 							connection.close unless connection.closed?
 						end
 						
-						requst = nil
+						request = nil
 						headers = response.headers
 						
 						if protocol = response.protocol

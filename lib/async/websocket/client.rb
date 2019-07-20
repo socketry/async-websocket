@@ -82,6 +82,10 @@ module Async
 				
 				return connection unless block_given?
 				
+				# Allow the GC to free these objects:
+				request = nil
+				response = nil
+				
 				begin
 					yield connection
 				ensure
