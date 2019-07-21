@@ -71,7 +71,7 @@ module Async
 				end
 			end
 			
-			def initialize(request, protocols: [], version: 13)
+			def initialize(request, protocols: [], version: 13, &block)
 				@key = Nounce.generate_key
 				
 				headers = [

@@ -34,17 +34,17 @@ module Async
 			include ::Protocol::WebSocket::Headers
 			
 			class Wrapper
-				def initialize(output, response)
-					@output = output
-					@body = output
+				def initialize(stream, response)
 					@response = response
-					@stream = nil
+					@body = @response.body
+					@stream = stream
 				end
 				
 				attr_accessor :body
+				attr_accessor :stream
 				
 				def stream?
-					@response.success?
+					@response.success? and @stream
 				end
 				
 				def status
@@ -62,14 +62,23 @@ module Async
 				def protocol
 					@response.protocol
 				end
+			end
+			
+			class Hijack < Async::HTTP::Body::Readable
+				def initialize(request)
+					@request = request
+					@stream = nil
+				end
 				
-				def stream
-					@stream ||= Async::HTTP::Body::Stream.new(@response.body, @output)
+				attr :stream
+				
+				def call(stream)
+					@stream = stream
 				end
 			end
 			
-			def initialize(request, protocols: [], version: 13)
-				body = Async::HTTP::Body::Writable.new
+			def initialize(request, protocols: [], version: 13, &block)
+				body = Hijack.new(self)
 				
 				headers = []
 				
@@ -85,7 +94,9 @@ module Async
 			end
 			
 			def call(connection)
-				Wrapper.new(body, super)
+				response = super
+				
+				Wrapper.new(@body.stream, response)
 			end
 		end
 	end

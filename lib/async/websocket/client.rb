@@ -66,7 +66,7 @@ module Async
 				@options = options
 			end
 			
-			def connect(path, headers: [], handler: Connection, **options)
+			def connect(path, headers: [], handler: Connection, **options, &block)
 				request = Request.new(nil, nil, path, headers, **options)
 				
 				response = self.call(request)
