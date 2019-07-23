@@ -25,6 +25,37 @@ class Room
 		@connections.each(&block)
 	end
 	
+	def allocations
+		counts = Hash.new{|h,k| h[k] = 0}
+		
+		ObjectSpace.each_object do |object|
+			counts[object.class] += 1
+		end
+		
+		return counts
+	end
+	
+	def show_allocations(key, limit = 1000)
+		Async.logger.info(self) do |buffer|
+			ObjectSpace.each_object(key).each do |object|
+				buffer.puts object
+			end
+		end
+	end
+	
+	def print_allocations(minimum = @connections.count)
+		count = 0
+		
+		Async.logger.info(self) do |buffer|
+			allocations.select{|k,v| v >= minimum}.sort_by{|k,v| -v}.each do |key, value|
+				count += value
+				buffer.puts "#{key}: #{value} allocations"
+			end
+			
+			buffer.puts "** #{count.to_f / @connections.count} objects per connection."
+		end
+	end
+	
 	def command(code)
 		Async.logger.warn self, "eval(#{code})"
 		
@@ -51,6 +82,7 @@ class Room
 				self.connect(connection)
 				
 				while message = connection.next_message
+					puts "Message: #{message.inspect}"
 					if message["text"] =~ /^\/(.*?)$/
 						begin
 							result = self.command($1)

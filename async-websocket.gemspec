@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
 	spec.add_dependency "async-io"
 	
 	spec.add_development_dependency "async-rspec"
-	spec.add_development_dependency "falcon", "~> 0.17"
+	spec.add_development_dependency "falcon", "~> 0.28.0"
 	
 	spec.add_development_dependency "covered"
 	spec.add_development_dependency "bundler"
