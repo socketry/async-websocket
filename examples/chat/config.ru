@@ -25,7 +25,7 @@ class Room
 		if (@count % 10000).zero?
 			# (full_mark: false, immediate_sweep: false)
 			duration = Async::Clock.measure{GC.start}
-			Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
+			Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count} @connections.count=#{@connections.count}"}
 		end
 	end
 	
