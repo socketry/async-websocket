@@ -43,10 +43,8 @@ class Command < Samovar::Command
 			task.async do |subtask|
 				while connection = connections.dequeue
 					subtask.async(connection) do |subtask, connection|
-						pp connection.read
-						
 						while message = connection.read
-							pp message
+							puts "> #{message.inspect}"
 						end
 					ensure
 						connection.close
@@ -70,7 +68,7 @@ class Command < Samovar::Command
 			
 			connections.enqueue(nil)
 			
-			Async.logger.info(self) {"Exiting top level connection loop..."}
+			Async.logger.info(self) {"Finished top level connection loop..."}
 		end
 	ensure
 		# client.close
