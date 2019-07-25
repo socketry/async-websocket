@@ -55,4 +55,4 @@ You can find the current limit:
 
 You can increase it:
 
-	% sysctl -w vm.max_map_count=655300
+	% sysctl -w vm.max_map_count=2500000
