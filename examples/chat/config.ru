@@ -15,6 +15,7 @@ class Room
 		@semaphore = Async::Semaphore.new(512)
 		
 		@count = 0
+		@profile = nil
 	end
 	
 	def connect connection
@@ -66,6 +67,28 @@ class Room
 			
 			buffer.puts "** #{count.to_f / @connections.count} objects per connection."
 		end
+	end
+	
+	def start_profile
+		require 'ruby-prof' unless defined?(RubyProf)
+		
+		return false if @profile
+		
+		@profile = RubyProf::Profile.new(merge_fibers: true)
+		@profile.start
+	end
+	
+	def stop_profile
+		return false unless @profile
+		
+		result = @profile.stop
+		printer = RubyProf::FlatPrinter.new(result)
+		printer.print(STDOUT, min_percent: 0.5)
+	
+		# printer = RubyProf::GraphPrinter.new(result)
+		# printer.print(STDOUT, min_percent: 0.5)
+		
+		@profile = nil
 	end
 	
 	def command(code)
