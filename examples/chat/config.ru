@@ -1,4 +1,4 @@
-#!/usr/bin/env -S falcon serve --bind https://localhost:8080 --count 1 --timeout 12000 -c
+#!/usr/bin/env -S falcon serve --bind https://localhost:8080 --count 1 -c
 
 require_relative '../../lib/async/websocket/adapters/rack'
 require 'async/clock'
