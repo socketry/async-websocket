@@ -92,7 +92,7 @@ class Room
 	def open(connection)
 		self.connect(connection)
 		
-		if @connections.count == 1_000_000
+		if @connections.size == 1_000_000
 			connection.write("Congratulations, you have completed the journey to one million! 🥳 👏👏👏🏼")
 		end
 		
