@@ -42,6 +42,8 @@ module Async
 					@stream = nil
 				end
 				
+				attr_accessor :response
+				
 				def stream?
 					@response.status == 101
 				end

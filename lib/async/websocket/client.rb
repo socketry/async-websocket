@@ -28,6 +28,8 @@ require 'protocol/http/middleware'
 
 require 'async/http/client'
 
+require 'irb'
+
 module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
@@ -60,37 +62,46 @@ module Async
 				end
 			end
 			
-			def initialize(delegate, **options)
-				super(delegate)
+			def initialize(client, **options)
+				super(client)
 				
 				@options = options
+			end
+			
+			class Framer < ::Protocol::WebSocket::Framer
+				def initialize(pool, connection, stream)
+					super(stream)
+					@pool = pool
+					@connection = connection
+				end
+				
+				def close
+					super
+					
+					if @pool
+						@pool.release(@connection)
+						@pool = nil
+						@connection = nil
+					end
+				end
 			end
 			
 			def connect(path, headers: [], handler: Connection, **options, &block)
 				request = Request.new(nil, nil, path, headers, **options)
 				
-				response = self.call(request)
+				pool = @delegate.pool
+				connection = pool.acquire
+				
+				response = request.call(connection)
 				
 				unless response.stream?
 					raise ProtocolError, "Failed to negotiate connection: #{response.status}"
 				end
 				
 				protocol = response.headers[SEC_WEBSOCKET_PROTOCOL]&.first
-				framer = Protocol::WebSocket::Framer.new(response.stream)
+				framer = Framer.new(pool, connection, response.stream)
 				
-				connection = handler.call(framer, protocol, **@options)
-				
-				return connection unless block_given?
-				
-				# Allow the GC to free these objects:
-				request = nil
-				response = nil
-				
-				begin
-					yield connection
-				ensure
-					connection.close
-				end
+				handler.call(framer, protocol, **@options, &block)
 			end
 		end
 	end

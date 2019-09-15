@@ -32,12 +32,31 @@ module Async
 			include ::Protocol::WebSocket::Headers
 			
 			def self.call(framer, protocol = [], **options)
-				return self.new(framer, Array(protocol).first, **options)
+				instance = self.new(framer, Array(protocol).first, **options)
+				
+				return instance unless block_given?
+				
+				begin
+					yield instance
+				ensure
+					instance.close
+				end
 			end
 			
-			def initialize(framer, protocol = nil, **options)
+			def initialize(framer, protocol = nil, response: nil, **options)
 				super(framer, **options)
 				@protocol = protocol
+				@response = response
+			end
+			
+			def close
+				super
+				
+				if @response
+					require 'irb'; binding.irb
+					@response.finish
+					@response = nil
+				end
 			end
 			
 			attr :protocol

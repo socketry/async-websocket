@@ -72,10 +72,46 @@ RSpec.shared_context Async::WebSocket::Server do
 	it "can establish connection" do
 		connection = client.connect("/server")
 		
-		expect(connection.read).to be == message
-		expect(connection.read).to be_nil
-		expect(connection).to be_closed
+		begin
+			expect(connection.read).to be == message
+			expect(connection.read).to be_nil
+			expect(connection).to be_closed
+		ensure
+			connection.close
+		end
+	end
+	
+	context "with headers" do
+		let(:headers) {{"foo" => "bar"}}
 		
-		connection.close
+		let(:server) do
+			Async::HTTP::Server.for(endpoint, protocol) do |request|
+				if Async::WebSocket::Request.websocket?(request)
+					Async::WebSocket::Response.for(request, headers) do |stream|
+						framer = Protocol::WebSocket::Framer.new(stream)
+						
+						connection = handler.call(framer)
+						
+						connection.write(request.headers.fields)
+						
+						connection.close
+					end
+				else
+					Protocol::HTTP::Response[404, {}, []]
+				end
+			end
+		end
+		
+		it "can send headers" do
+			connection = client.connect("/headers", headers: headers)
+			
+			begin
+				expect(connection.read.to_h).to include(*headers.keys)
+				expect(connection.read).to be_nil
+				expect(connection).to be_closed
+			ensure
+				connection.close
+			end
+		end
 	end
 end

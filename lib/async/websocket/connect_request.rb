@@ -40,6 +40,8 @@ module Async
 					@stream = stream
 				end
 				
+				attr_accessor :response
+				
 				attr_accessor :body
 				attr_accessor :stream
 				
