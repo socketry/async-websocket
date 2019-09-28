@@ -48,7 +48,7 @@ Async do |task|
 	
 	endpoint = Async::HTTP::Endpoint.parse(URL)
 	
-	Async::WebSocket::Client.open(endpoint) do |connection|
+	Async::WebSocket::Client.connect(endpoint) do |connection|
 		input_task = task.async do
 			while line = stdin.read_until("\n")
 				connection.write({user: USER, text: line})
