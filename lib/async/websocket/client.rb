@@ -36,6 +36,7 @@ module Async
 		class Client < ::Protocol::HTTP::Middleware
 			include ::Protocol::WebSocket::Headers
 			
+			# @return [Client] a client which can be used to establish websocket connections to the given endpoint.
 			def self.open(endpoint, *args, &block)
 				client = self.new(HTTP::Client.new(endpoint, *args), mask: endpoint.secure?)
 				
@@ -48,6 +49,7 @@ module Async
 				end
 			end
 			
+			# @return [Connection] an open websocket connection to the given endpoint.
 			def self.connect(endpoint, *args, **options, &block)
 				self.open(endpoint, *args) do |client|
 					connection = client.connect(endpoint.path, **options)
