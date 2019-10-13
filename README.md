@@ -6,6 +6,8 @@ A simple asynchronous websocket client/server implementation for [HTTP/1](https:
 [![Code Climate](https://codeclimate.com/github/socketry/async-websocket.svg)](https://codeclimate.com/github/socketry/async-websocket)
 [![Coverage Status](https://coveralls.io/repos/socketry/async-websocket/badge.svg)](https://coveralls.io/r/socketry/async-websocket)
 
+[![WebSocket Client & Server for Ruby](https://img.youtube.com/vi/aHop4Yyjs_o/0.jpg)](https://www.youtube.com/watch?v=aHop4Yyjs_o)
+
 ## Installation
 
 Add this line to your application's Gemfile:
