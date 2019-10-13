@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'async'
-require 'async/io/stream'
 require 'async/http/endpoint'
 require 'async/websocket/client'
 
@@ -11,7 +10,7 @@ Async do |task|
 	endpoint = Async::HTTP::Endpoint.parse(URL)
 	
 	Async::WebSocket::Client.connect(endpoint) do |connection|
-		connection.write ["Hello World"]
+		connection.write ["Hello", "World"]
 		
 		while message = connection.read
 			p message

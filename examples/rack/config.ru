@@ -3,11 +3,9 @@
 require 'async/websocket/adapters/rack'
 
 app = lambda do |env|
-	Async::WebSocket::Adapters::Rack.open(env, protocols: ['ws']) do |connection|
-		p [env["REMOTE_ADDR"], "connected", env["VERSION"]]
+	Async::WebSocket::Adapters::Rack.open(env) do |connection|
 		message = connection.read
-		p message
-		connection.write message
+		connection.write message.reverse
 	end
 end
 
