@@ -98,6 +98,18 @@ run lambda {|env|
 }
 ```
 
+### Force HTTP/1 Connection
+
+This forces the endpoint to connect using `HTTP/1.1`.
+
+```ruby
+endpoint = Async::HTTP::Endpoint.parse("https://remote-server.com", alpn_protocols: Async::HTTP::Protocol::HTTP11.names)
+
+Async::WebSocket::Client.connect(endpoint) do ...
+```
+
+You may want to use this if the server advertises `HTTP/2` but doesn't support `HTTP/2` for WebSocket connections.
+
 ## Contributing
 
 1. Fork it
