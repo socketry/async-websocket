@@ -28,8 +28,6 @@ require 'protocol/http/middleware'
 
 require 'async/http/client'
 
-require 'irb'
-
 module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
