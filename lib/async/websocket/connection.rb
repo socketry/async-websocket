@@ -53,7 +53,6 @@ module Async
 				super
 				
 				if @response
-					require 'irb'; binding.irb
 					@response.finish
 					@response = nil
 				end
