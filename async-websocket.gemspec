@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
 	spec.add_dependency "protocol-websocket", "~> 0.7.0"
 	
 	spec.add_development_dependency "async-rspec"
-	spec.add_development_dependency "falcon"
+	spec.add_development_dependency "falcon", "~>  0.34"
 	
 	spec.add_development_dependency "covered"
 	spec.add_development_dependency "bundler"
