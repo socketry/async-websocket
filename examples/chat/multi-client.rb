@@ -9,8 +9,6 @@ require_relative '../../lib/async/websocket/client'
 
 require 'samovar'
 
-require 'tty/progressbar'
-
 GC.disable
 
 class Command < Samovar::Command
@@ -29,13 +27,12 @@ class Command < Samovar::Command
 	end
 	
 	def call
-		endpoint = Async::HTTP::Endpoint.parse(@options[:connect], local_address: self.local_address)
-		endpoint = endpoint.each.first
+		endpoint = Async::HTTP::Endpoint.parse(@options[:connect])
+		# endpoint = endpoint.each.first
 		
 		count = @options[:count]
 		
 		connections = Async::Queue.new
-		progress = TTY::ProgressBar.new(":rate connection/s [:bar] :current/:total (:eta/:elapsed)", total: count)
 		
 		Async do |task|
 			task.logger.info!
@@ -55,10 +52,16 @@ class Command < Samovar::Command
 			end
 			
 			client = Async::WebSocket::Client.open(endpoint)
+			start_time = Async::Clock.now
 			
 			count.times do |i|
 				connections.enqueue(client.connect(endpoint.path))
-				progress.advance(1)
+				
+				if (i % 10000).zero?
+					count = i+1
+					duration = Async::Clock.now - start_time
+					Async.logger.info(self) {"Made #{count} connections: #{(count/duration).round(2)} connections/second..."}
+				end
 				
 				if (i % 10000).zero?
 					duration = Async::Clock.measure{GC.start(full_mark: false, immediate_sweep: false)}
@@ -70,14 +73,6 @@ class Command < Samovar::Command
 			
 			Async.logger.info(self) {"Finished top level connection loop..."}
 		end
-	ensure
-		# client.close
-	# 	result = profile.stop
-	# 	printer = RubyProf::FlatPrinter.new(result)
-	# 	printer.print(STDOUT, min_percent: 0.5)
-	# 
-	# 	printer = RubyProf::GraphPrinter.new(result)
-	# 	printer.print(STDOUT, min_percent: 0.5)
 	end
 end
 
