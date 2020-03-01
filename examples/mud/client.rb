@@ -15,7 +15,7 @@ Async do |task|
 	
 	endpoint = Async::HTTP::Endpoint.parse(URL)
 	
-	Async::WebSocket::Client.open(endpoint) do |connection|
+	Async::WebSocket::Client.connect(endpoint) do |connection|
 		task.async do
 			$stdout.write "> "
 			
