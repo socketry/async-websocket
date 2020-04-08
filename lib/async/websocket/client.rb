@@ -86,7 +86,8 @@ module Async
 				end
 			end
 			
-			def connect(path, headers: [], handler: Connection, **options, &block)
+			def connect(path, headers: nil, handler: Connection, **options, &block)
+				headers = ::Protocol::HTTP::Headers[headers]
 				request = Request.new(nil, nil, path, headers, **options)
 				
 				pool = @delegate.pool

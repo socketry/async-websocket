@@ -27,7 +27,7 @@ module Async
 	module WebSocket
 		module Response
 			# Send the request to the given connection.
-			def self.for(request, headers = [], **options, &body)
+			def self.for(request, headers = nil, **options, &body)
 				if request.version =~ /http\/1/i
 					return UpgradeResponse.new(request, headers, **options, &body)
 				elsif request.version =~ /h2/i

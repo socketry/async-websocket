@@ -30,7 +30,7 @@ module Async
 				Array(request.protocol).include?(PROTOCOL)
 			end
 			
-			def initialize(scheme = nil, authority = nil, path = nil, headers = [], **options, &block)
+			def initialize(scheme = nil, authority = nil, path = nil, headers = nil, **options, &block)
 				@scheme = scheme
 				@authority = authority
 				@path = path

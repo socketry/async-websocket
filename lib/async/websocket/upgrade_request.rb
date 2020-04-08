@@ -76,18 +76,16 @@ module Async
 			def initialize(request, protocols: [], version: 13, &block)
 				@key = Nounce.generate_key
 				
-				headers = [
-					[SEC_WEBSOCKET_KEY, @key],
-					[SEC_WEBSOCKET_VERSION, version],
-				]
+				headers = ::Protocol::HTTP::Headers[request.headers]
+				
+				headers.add(SEC_WEBSOCKET_KEY, @key)
+				headers.add(SEC_WEBSOCKET_VERSION, String(version))
 				
 				if protocols.any?
-					headers << [SEC_WEBSOCKET_PROTOCOL, protocols.join(',')]
+					headers.add(SEC_WEBSOCKET_PROTOCOL, protocols.join(','))
 				end
 				
-				merged_headers = ::Protocol::HTTP::Headers::Merged.new(request.headers, headers)
-				
-				super(request.scheme, request.authority, ::Protocol::HTTP::Methods::GET, request.path, nil, merged_headers, nil, PROTOCOL)
+				super(request.scheme, request.authority, ::Protocol::HTTP::Methods::GET, request.path, nil, headers, nil, PROTOCOL)
 			end
 			
 			def call(connection)

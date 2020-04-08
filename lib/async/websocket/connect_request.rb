@@ -82,17 +82,15 @@ module Async
 			def initialize(request, protocols: [], version: 13, &block)
 				body = Hijack.new(self)
 				
-				headers = []
+				headers = ::Protocol::HTTP::Headers[request.headers]
 				
-				headers << [SEC_WEBSOCKET_VERSION, version]
+				headers.add(SEC_WEBSOCKET_VERSION, String(version))
 				
 				if protocols.any?
-					headers << [SEC_WEBSOCKET_PROTOCOL, protocols.join(',')]
+					headers.add(SEC_WEBSOCKET_PROTOCOL, protocols.join(','))
 				end
 				
-				merged_headers = ::Protocol::HTTP::Headers::Merged.new(request.headers, headers)
-				
-				super(request.scheme, request.authority, ::Protocol::HTTP::Methods::CONNECT, request.path, nil, merged_headers, body, PROTOCOL)
+				super(request.scheme, request.authority, ::Protocol::HTTP::Methods::CONNECT, request.path, nil, headers, body, PROTOCOL)
 			end
 			
 			def call(connection)
