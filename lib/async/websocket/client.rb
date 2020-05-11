@@ -96,6 +96,7 @@ module Async
 				response = request.call(connection)
 				
 				unless response.stream?
+					pool.release(connection)
 					raise ProtocolError, "Failed to negotiate connection: #{response.status}"
 				end
 				
