@@ -65,7 +65,7 @@ class Command < Samovar::Command
 				
 				if (i % 10000).zero?
 					duration = Async::Clock.measure{GC.start(full_mark: false, immediate_sweep: false)}
-					Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
+					Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.size=#{GC.size}"}
 				end
 			end
 			
