@@ -100,9 +100,15 @@ module Async
 				end
 				
 				protocol = response.headers[SEC_WEBSOCKET_PROTOCOL]&.first
-				framer = Framer.new(pool, connection, response.stream)
+				stream = response.stream
+				response = nil
+				
+				framer = Framer.new(pool, connection, stream)
+				connection = nil
 				
 				handler.call(framer, protocol, **@options, &block)
+			ensure
+				pool.release(connection) if connection
 			end
 		end
 	end
