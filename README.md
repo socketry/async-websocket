@@ -6,7 +6,7 @@ An asynchronous websocket client/server implementation for [HTTP/1](https://tool
 
 ## Usage
 
-Please see the [project documentation](https://socketry.github.io/async-websocket) or serve it locally using `bake utopia:project:serve`.
+Please see the [project documentation](https://socketry.github.io/async-websocket/) or serve it locally using `bake utopia:project:serve`.
 
 ## Contributing
 
