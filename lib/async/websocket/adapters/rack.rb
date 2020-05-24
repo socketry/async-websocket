@@ -63,7 +63,7 @@ module Async
 							])
 						end
 						
-						return [response.status, headers, response.body]
+						return [response.status, headers.to_h, response.body]
 					end
 				end
 			end
