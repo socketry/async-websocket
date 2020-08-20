@@ -91,6 +91,7 @@ module Async
 				request = Request.new(nil, nil, path, headers, **options)
 				
 				pool = @delegate.pool
+				request.authority ||= @delegate.authority
 				connection = pool.acquire
 				
 				response = request.call(connection)
