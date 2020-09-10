@@ -50,7 +50,7 @@ module Async
 			# @return [Connection] an open websocket connection to the given endpoint.
 			def self.connect(endpoint, *args, **options, &block)
 				self.open(endpoint, *args) do |client|
-					connection = client.connect(endpoint.path, **options)
+					connection = client.connect(endpoint.authority, endpoint.path, **options)
 					
 					return connection unless block_given?
 					
@@ -86,9 +86,9 @@ module Async
 				end
 			end
 			
-			def connect(path, headers: nil, handler: Connection, **options, &block)
+			def connect(authority, path, headers: nil, handler: Connection, **options, &block)
 				headers = ::Protocol::HTTP::Headers[headers]
-				request = Request.new(nil, nil, path, headers, **options)
+				request = Request.new(nil, authority, path, headers, **options)
 				
 				pool = @delegate.pool
 				connection = pool.acquire

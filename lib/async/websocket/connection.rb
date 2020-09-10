@@ -45,6 +45,7 @@ module Async
 			
 			def initialize(framer, protocol = nil, response: nil, **options)
 				super(framer, **options)
+				
 				@protocol = protocol
 				@response = response
 			end
