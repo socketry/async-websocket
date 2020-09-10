@@ -40,8 +40,6 @@ RSpec.shared_context Async::WebSocket::Server do
 	end
 	
 	after(:each) do
-		Async.logger.debug(client, "Closing client...")
-		client.close
 		Async.logger.debug(server_task, "Closing server...")
 		server_task.stop
 	end
@@ -70,7 +68,7 @@ RSpec.shared_context Async::WebSocket::Server do
 	end
 	
 	it "can establish connection" do
-		connection = client.connect("/server")
+		connection = client.connect(endpoint.authority, "/server")
 		
 		begin
 			expect(connection.read).to be == message
@@ -103,7 +101,7 @@ RSpec.shared_context Async::WebSocket::Server do
 		end
 		
 		it "can send headers" do
-			connection = client.connect("/headers", headers: headers)
+			connection = client.connect(endpoint.authority, "/headers", headers: headers)
 			
 			begin
 				expect(connection.read.to_h).to include(*headers.keys)
