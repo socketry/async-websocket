@@ -1,7 +1,7 @@
 
 source "https://rubygems.org"
 
-gem "utopia", "~> 2.9.3"
+gem "utopia", "~> 2.9"
 
 gem "rake"
 gem "bundler"
@@ -25,9 +25,4 @@ group :development do
 	
 	# For testing:
 	gem 'async-rspec'
-end
-
-group :production do
-	# Used for passenger-config to restart server after deployment:
-	gem "passenger"
 end
