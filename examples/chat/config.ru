@@ -7,7 +7,7 @@ require 'async/logger'
 
 require 'set'
 
-GC.disable
+# GC.disable
 
 class Room
 	def initialize
@@ -23,11 +23,11 @@ class Room
 		
 		@count += 1
 		
-		if (@count % 10000).zero?
-			# (full_mark: false, immediate_sweep: false)
-			duration = Async::Clock.measure{GC.start}
-			Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count} @connections.count=#{@connections.count}"}
-		end
+		# if (@count % 10000).zero?
+		# 	# (full_mark: false, immediate_sweep: false)
+		# 	duration = Async::Clock.measure{GC.start}
+		# 	Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count} @connections.count=#{@connections.count}"}
+		# end
 	end
 	
 	def disconnect connection
