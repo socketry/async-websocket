@@ -72,6 +72,10 @@ module Async
 					@stream = nil
 				end
 				
+				def stream?
+					true
+				end
+				
 				attr :stream
 				
 				def call(stream)
