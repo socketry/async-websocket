@@ -1,26 +1,32 @@
 
 prepend Actions
 
+require 'chat'
 require 'async/websocket/adapters/rack'
-require 'set'
-
-$connections = Set.new
 
 on 'connect' do |request|
+	channel = "chat.general"
+	
 	response = Async::WebSocket::Adapters::Rack.open(request.env) do |connection|
-		$connections << connection
+		client = Chat::Redis.instance
 		
-		while message = connection.read
-			$connections.each do |connection|
-				puts "Server sending message: #{message.inspect}"
-				connection.write(message)
+		subscription_task = Async do
+			client.subscribe(channel) do |context|
+				while true
+					type, name, message = context.listen
+					
+					connection.write(JSON.parse(message))
+					connection.flush
+				end
 			end
 		end
+		
+		while message = connection.read
+			client.publish(channel, JSON.dump(message))
+		end
 	ensure
-		$connections.delete(connection)
+		subscription_task&.stop
 	end
-	
-	Async.logger.info(self, request, response)
 	
 	respond?(response)
 end

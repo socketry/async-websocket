@@ -7,6 +7,14 @@ group :preload do
 	# gem 'utopia-gallery'
 	# gem 'utopia-analytics'
 	
+	gem 'thread-local'
+	
+	gem 'async-redis'
+	gem 'async-websocket'
+	
+	gem 'db'
+	gem 'db-postgres'
+	
 	gem 'variant'
 end
 

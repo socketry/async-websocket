@@ -4,9 +4,11 @@ url.protocol = url.protocol.replace('http', 'ws');
 
 console.log("Connecting to server", url);
 var server = new WebSocket(url.href);
-console.log("Connected to", server);
 
 server.onopen = function(event) {
+	console.log("Connected to", server);
+	chat.disabled = false;
+	
 	chat.onkeypress = function(event) {
 		if (event.keyCode == 13) {
 			server.send(JSON.stringify({text: chat.value}));

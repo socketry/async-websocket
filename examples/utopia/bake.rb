@@ -14,3 +14,24 @@ end
 def default
 	call 'utopia:development'
 end
+
+def migrate
+	call 'utopia:environment'
+	
+	require 'chat'
+	
+	Async do
+		client = Chat::Database.instance
+		session = client.session
+		
+		result = session.clause("DROP TABLE IF EXISTS").identifier("todo").call
+		
+		result = session.clause("CREATE TABLE").identifier("todo")
+			.clause("(")
+				.identifier("id").clause("serial PRIMARY KEY,")
+				.identifier("description").clause("TEXT,")
+				.identifier("created_at").clause("TIMESTAMP NOT NULL,")
+				.identifier("completed_at").clause("TIMESTAMP")
+			.clause(")").call
+	end
+end

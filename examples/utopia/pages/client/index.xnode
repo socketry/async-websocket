@@ -1,8 +1,10 @@
 <content:page>
-	<content:heading>Client</content:heading>
+	<content:heading>Client (PID: #{Process.pid})</content:heading>
 	
-	<script src="client.js?#{rand}"></script>
+	<script src="client.js"></script>
 	<section id="response" style="border: 1px;"></section>
 	
-	<input id="chat" />
+	<section class="input">
+		<input id="chat" disabled="true"/>
+	</section>
 </content:page>
