@@ -1,10 +1,10 @@
 
 function connectToChatServer(url) {
-	console.log("Connecting to server", url);
+	console.log("WebSocket Connecting...", url);
 	var server = new WebSocket(url.href);
-
+	
 	server.onopen = function(event) {
-		console.log("Connected to", server);
+		console.log("WebSocket Connected:", server);
 		chat.disabled = false;
 		
 		chat.onkeypress = function(event) {
@@ -15,9 +15,9 @@ function connectToChatServer(url) {
 			}
 		}
 	};
-
+	
 	server.onmessage = function(event) {
-		console.log("Got message", event);
+		console.log("WebSocket Message:", event);
 		
 		var message = JSON.parse(event.data);
 		
@@ -26,15 +26,15 @@ function connectToChatServer(url) {
 		
 		response.appendChild(pre);
 	};
-
+	
 	server.onerror = function(event) {
-		console.log("WebSocket Error", event);
+		console.log("WebSocket Error:", event);
 		chat.disabled = true;
 		server.close();
 	};
-
+	
 	server.onclose = function(event) {
-		console.log("WebSocket Close", event);
+		console.log("WebSocket Close:", event);
 		
 		setTimeout(function() {
 			connectToChatServer(url);
