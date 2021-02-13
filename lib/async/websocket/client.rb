@@ -35,8 +35,8 @@ module Async
 			include ::Protocol::WebSocket::Headers
 			
 			# @return [Client] a client which can be used to establish websocket connections to the given endpoint.
-			def self.open(endpoint, *args, &block)
-				client = self.new(HTTP::Client.new(endpoint, *args), mask: true)
+			def self.open(endpoint, **options, &block)
+				client = self.new(HTTP::Client.new(endpoint, **options), mask: true)
 				
 				return client unless block_given?
 				

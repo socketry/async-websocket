@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
 	
 	spec.files = Dir.glob('{lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
 	
-	spec.add_dependency "async-http", "~> 0.53"
+	spec.add_dependency "async-http", "~> 0.54"
 	spec.add_dependency "async-io", "~> 1.23"
 	spec.add_dependency "protocol-websocket", "~> 0.7.0"
 	
