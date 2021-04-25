@@ -35,14 +35,14 @@ RSpec.describe Async::WebSocket::Adapters::Rack do
 	let(:server) {Falcon::Server.new(Falcon::Server.middleware(app), endpoint)}
 	let(:client) {Async::HTTP::Client.new(endpoint)}
 	
-	let!(:server_task) do
-		reactor.async do
+	before do
+		@server_task = reactor.async do
 			server.run
 		end
 	end
 	
 	after do
-		server_task.stop
+		@server_task.stop
 	end
 	
 	it "can make non-websocket connection to server" do
