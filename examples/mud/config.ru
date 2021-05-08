@@ -131,7 +131,7 @@ class Server
 				user.handle(message)
 			end
 		ensure
-			# Async.logger.error(self, $!) if $!
+			# Console.logger.error(self, $!) if $!
 			user.close
 		end or @app.call(env)
 	end

@@ -65,18 +65,18 @@ class Command < Samovar::Command
 				if (i % 10000).zero?
 					count = i+1
 					duration = Async::Clock.now - start_time
-					Async.logger.info(self) {"Made #{count} connections: #{(count/duration).round(2)} connections/second..."}
+					Console.logger.info(self) {"Made #{count} connections: #{(count/duration).round(2)} connections/second..."}
 				end
 				
 				# if (i % 10000).zero?
 				# 	duration = Async::Clock.measure{GC.start(full_mark: false, immediate_sweep: false)}
-				# 	Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
+				# 	Console.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
 				# end
 			end
 			
 			connections.enqueue(nil)
 			
-			Async.logger.info(self) {"Finished top level connection loop..."}
+			Console.logger.info(self) {"Finished top level connection loop..."}
 			
 			GC::Profiler.report
 		end

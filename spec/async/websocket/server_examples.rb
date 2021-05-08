@@ -40,7 +40,7 @@ RSpec.shared_context Async::WebSocket::Server do
 	end
 	
 	after(:each) do
-		Async.logger.debug(server_task, "Closing server...")
+		Console.logger.debug(server_task, "Closing server...")
 		server_task.stop
 	end
 	
