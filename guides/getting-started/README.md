@@ -7,7 +7,7 @@ This guide shows you how to implement a basic client and server.
 Add the gem to your project:
 
 ~~~ bash
-$ bundle add decode
+$ bundle add async-websocket
 ~~~
 
 ## Overview Video
