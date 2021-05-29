@@ -49,16 +49,16 @@ module Async
 			
 			# @return [Connection] an open websocket connection to the given endpoint.
 			def self.connect(endpoint, *args, **options, &block)
-				self.open(endpoint, *args) do |client|
-					connection = client.connect(endpoint.authority, endpoint.path, **options)
+				client = self.open(endpoint, *args)
+				connection = client.connect(endpoint.authority, endpoint.path, **options)
 					
-					return connection unless block_given?
+				return connection unless block_given?
 					
-					begin
-						yield connection
-					ensure
-						connection.close
-					end
+				begin
+					yield connection
+				ensure
+					connection.close
+					client.close
 				end
 			end
 			
