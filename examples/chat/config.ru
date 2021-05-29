@@ -3,7 +3,6 @@
 require_relative '../../lib/async/websocket/adapters/rack'
 require 'async/clock'
 require 'async/semaphore'
-require 'async/logger'
 
 require 'set'
 
@@ -26,7 +25,7 @@ class Room
 		# if (@count % 10000).zero?
 		# 	# (full_mark: false, immediate_sweep: false)
 		# 	duration = Async::Clock.measure{GC.start}
-		# 	Async.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count} @connections.count=#{@connections.count}"}
+		# 	Console.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count} @connections.count=#{@connections.count}"}
 		# end
 	end
 	
@@ -49,7 +48,7 @@ class Room
 	end
 	
 	def show_allocations(key, limit = 1000)
-		Async.logger.info(self) do |buffer|
+		Console.logger.info(self) do |buffer|
 			ObjectSpace.each_object(key).each do |object|
 				buffer.puts object
 			end
@@ -59,7 +58,7 @@ class Room
 	def print_allocations(minimum = @connections.count)
 		count = 0
 		
-		Async.logger.info(self) do |buffer|
+		Console.logger.info(self) do |buffer|
 			allocations.select{|k,v| v >= minimum}.sort_by{|k,v| -v}.each do |key, value|
 				count += value
 				buffer.puts "#{key}: #{value} allocations"
@@ -92,13 +91,13 @@ class Room
 	end
 	
 	def command(code)
-		Async.logger.warn self, "eval(#{code})"
+		Console.logger.warn self, "eval(#{code})"
 		
 		eval(code)
 	end
 	
 	def broadcast(message)
-		Async.logger.info "Broadcast: #{message.inspect}"
+		Console.logger.info "Broadcast: #{message.inspect}"
 		start_time = Async::Clock.now
 		
 		@connections.each do |connection|
@@ -109,7 +108,7 @@ class Room
 		end
 		
 		end_time = Async::Clock.now
-		Async.logger.info "Duration: #{(end_time - start_time).round(3)}s for #{@connections.count} connected clients."
+		Console.logger.info "Duration: #{(end_time - start_time).round(3)}s for #{@connections.count} connected clients."
 	end
 	
 	def open(connection)
