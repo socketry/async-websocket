@@ -20,33 +20,42 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'http'
+require_relative '../connection'
+require_relative '../response'
 
 module Async
 	module WebSocket
 		module Adapters
-			module Rack
+			module HTTP
 				include ::Protocol::WebSocket::Headers
 				
-				def self.websocket?(env)
-					request = env['async.http.request'] and Array(request.protocol).include?(PROTOCOL)
+				def self.websocket?(request)
+					Array(request.protocol).include?(PROTOCOL)
 				end
 				
-				def self.open(env, **options, &block)
-					if request = env['async.http.request']
-						env = nil
-						
-						if response = HTTP.open(request, **options, &block)
-							headers = response.headers
-							
-							if protocol = response.protocol
-								headers = Protocol::HTTP::Headers::Merged.new(headers, [
-									['rack.protocol', protocol]
-								])
-							end
-							
-							return [response.status, headers.to_h, response.body]
+				def self.open(request, headers: [], protocols: [], handler: Connection, **options, &block)
+					if Array(request.protocol).include?(PROTOCOL)
+						# Select websocket sub-protocol:
+						if requested_protocol = request.headers[SEC_WEBSOCKET_PROTOCOL]
+							protocol = (requested_protocol & protocols).first
 						end
+						
+						response = Response.for(request, headers, protocol: protocol, **options) do |stream|
+							# Once we get to this point, we no longer need to hold on to the response:
+							response = nil
+							
+							framer = Protocol::WebSocket::Framer.new(stream)
+							connection = handler.call(framer, protocol)
+							
+							yield connection
+							
+							connection.close unless connection.closed?
+						end
+						
+						# Once we get to this point, we no longer need to hold on to the request:
+						request = nil
+						
+						return response
 					end
 				end
 			end
