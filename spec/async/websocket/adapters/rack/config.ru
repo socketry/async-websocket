@@ -11,9 +11,9 @@ run lambda {|env|
 		
 		begin
 			while message = connection.read
-				$connections.each do |connection|
-					connection.write(message)
-					connection.flush
+				$connections.each do |c|
+					c.write(message)
+					c.flush
 				end
 			end
 		ensure
