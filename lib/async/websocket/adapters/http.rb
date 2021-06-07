@@ -30,11 +30,11 @@ module Async
 				include ::Protocol::WebSocket::Headers
 				
 				def self.websocket?(request)
-					Array(request.protocol).include?(PROTOCOL)
+					Array(request.protocol).any? { |e| e.casecmp?(PROTOCOL) }
 				end
 				
 				def self.open(request, headers: [], protocols: [], handler: Connection, **options, &block)
-					if Array(request.protocol).include?(PROTOCOL)
+					if websocket?(request)
 						# Select websocket sub-protocol:
 						if requested_protocol = request.headers[SEC_WEBSOCKET_PROTOCOL]
 							protocol = (requested_protocol & protocols).first
