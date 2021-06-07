@@ -29,6 +29,7 @@ jobs:
           - os: ubuntu
             ruby: jruby
             experimental: true
+            env: JRUBY_OPTS="-X+O"
           - os: ubuntu
             ruby: head
             experimental: true
