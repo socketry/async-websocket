@@ -25,13 +25,18 @@ require 'async/http/client'
 require 'async/http/server'
 require 'async/http/endpoint'
 
+require 'async/io/shared_endpoint'
+
 RSpec.shared_context Async::WebSocket::Server do
 	include_context Async::RSpec::Reactor
 	
 	let(:protocol) {described_class}
-	let(:endpoint) {Async::HTTP::Endpoint.parse('http://127.0.0.1:8008')}
+	let(:endpoint) {Async::HTTP::Endpoint.parse('http://127.0.0.1:8008', reuse_port: true)}
 	
-	let!(:client) {Async::WebSocket::Client.open(endpoint, protocol: protocol)}
+	let!(:bound_endpoint) {Async::IO::SharedEndpoint.bound(endpoint)}
+	after{bound_endpoint.close}
+
+	let(:client) {Async::WebSocket::Client.open(endpoint, protocol: protocol)}
 	
 	let!(:server_task) do
 		reactor.async do
@@ -50,7 +55,7 @@ RSpec.shared_context Async::WebSocket::Server do
 	let(:message) {["Hello World"]}
 	
 	let(:server) do
-		Async::HTTP::Server.for(endpoint, protocol: protocol) do |request|
+		Async::HTTP::Server.for(bound_endpoint, protocol: protocol, scheme: endpoint.scheme) do |request|
 			if Async::WebSocket::Request.websocket?(request)
 				Async::WebSocket::Response.for(request, headers) do |stream|
 					framer = Protocol::WebSocket::Framer.new(stream)
@@ -83,7 +88,7 @@ RSpec.shared_context Async::WebSocket::Server do
 		let(:headers) {{"foo" => "bar"}}
 		
 		let(:server) do
-			Async::HTTP::Server.for(endpoint, protocol: protocol) do |request|
+			Async::HTTP::Server.for(bound_endpoint, protocol: protocol, scheme: endpoint.scheme) do |request|
 				if Async::WebSocket::Request.websocket?(request)
 					Async::WebSocket::Response.for(request, headers) do |stream|
 						framer = Protocol::WebSocket::Framer.new(stream)
