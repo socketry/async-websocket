@@ -33,11 +33,22 @@ module Async
 					Array(request.protocol).any? { |e| e.casecmp?(PROTOCOL) }
 				end
 				
-				def self.open(request, headers: [], protocols: [], handler: Connection, **options, &block)
+				def self.open(request, headers: [], protocols: [], extensions: nil, **options, &block)
 					if websocket?(request)
 						# Select websocket sub-protocol:
 						if requested_protocol = request.headers[SEC_WEBSOCKET_PROTOCOL]
 							protocol = (requested_protocol & protocols).first
+						end
+						
+						klass = Connection
+						
+						extensions&.each do |extension|
+							# Given the request header which contains the "offer" by the client, configure the klass to suit.
+							klass = klass.negotiate(request.headers, klass, options)
+						end
+						
+						if extensions = request.headers[SEC_WEBSOCKET_EXTENSIONS]
+							extensions = handler.negotiate(requested_extensions)
 						end
 						
 						response = Response.for(request, headers, protocol: protocol, **options) do |stream|
@@ -45,7 +56,7 @@ module Async
 							response = nil
 							
 							framer = Protocol::WebSocket::Framer.new(stream)
-							connection = handler.call(framer, protocol)
+							connection = klass.call(framer, protocol, extensions)
 							
 							yield connection
 							
