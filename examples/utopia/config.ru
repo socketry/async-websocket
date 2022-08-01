@@ -14,6 +14,7 @@ else
 	use Rack::ShowExceptions unless UTOPIA.testing?
 end
 
+# serve static files from public/
 use Utopia::Static, root: 'public'
 
 use Utopia::Redirection::Rewrite, {
@@ -39,6 +40,7 @@ use Utopia::Session,
 
 use Utopia::Controller
 
+# serve static files from pages/
 use Utopia::Static
 
 # Serve dynamic content
