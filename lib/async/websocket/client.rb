@@ -86,8 +86,14 @@ module Async
 				end
 			end
 			
-			def connect(authority, path, headers: nil, handler: Connection, **options, &block)
+			def connect(authority, path, headers: nil, extensions: nil, **options, &block)
 				headers = ::Protocol::HTTP::Headers[headers]
+				
+				# Prepare the request headers with any required extensions:
+				extensions&.each do |extension|
+					extension.client_offer(headers)
+				end
+				
 				request = Request.new(nil, authority, path, headers, **options)
 				
 				pool = @delegate.pool
@@ -106,7 +112,14 @@ module Async
 				framer = Framer.new(pool, connection, stream)
 				connection = nil
 				
-				handler.call(framer, protocol, **@options, &block)
+				klass = Connection
+				options = @options.dup
+				
+				extensions&.each do |extension|
+					klass = extension.apply(response.headers, klass, options)
+				end
+				
+				connection = klass.call(framer, protocol, **options, &block)
 			ensure
 				pool.release(connection) if connection
 			end
