@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require_relative "lib/async/websocket/version"
 
@@ -6,8 +7,11 @@ Gem::Specification.new do |spec|
 	spec.version = Async::WebSocket::VERSION
 	
 	spec.summary = "An async websocket library on top of websocket-driver."
-	spec.authors = ["Samuel Williams"]
+	spec.authors = ["Samuel Williams", "destructobeam", "Olle Jonsson", "Aurora", "Bryan Powell", "Gleb Sinyavskiy", "Janko Marohnić", "Michel Boaventura", "jaml"]
 	spec.license = "MIT"
+	
+	spec.cert_chain  = ['release.cert']
+	spec.signing_key = File.expand_path('~/.gem/release.pem')
 	
 	spec.homepage = "https://github.com/socketry/async-websocket"
 	

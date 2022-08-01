@@ -2,8 +2,15 @@ name: Development
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
+env:
+  CONSOLE_OUTPUT: XTerm
+
 jobs:
   test:
+    name: ${{matrix.ruby}} on ${{matrix.os}}
     runs-on: ${{matrix.os}}-latest
     continue-on-error: ${{matrix.experimental}}
     
@@ -14,13 +21,11 @@ jobs:
           - macos
         
         ruby:
-          - 2.5
-          - 2.6
-          - 2.7
+          - "2.7"
           - "3.0"
+          - "3.1"
         
         experimental: [false]
-        env: [""]
         
         include:
           - os: ubuntu
@@ -35,7 +40,7 @@ jobs:
             experimental: true
     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{matrix.ruby}}
@@ -43,4 +48,4 @@ jobs:
     
     - name: Run tests
       timeout-minutes: 5
-      run: ${{matrix.env}} bundle exec rspec
+      run: bundle exec rspec
