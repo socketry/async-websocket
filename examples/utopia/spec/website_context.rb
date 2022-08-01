@@ -34,10 +34,10 @@ RSpec.shared_context "server" do
 		require 'benchmark/http/spider'
 	end
 	
-	let(:endpoint) {Async::HTTP::Endpoint.parse("http://localhost", Async::IO::Endpoint.unix("server.ipc"))}
-	
-	let!(:server_task) do
-		reactor.async do
+	before do
+		@endpoint = Async::HTTP::Endpoint.parse("http://localhost", Async::IO::Endpoint.unix("server.ipc"))
+		
+		@server_task = reactor.async do
 			middleware = Falcon::Server.middleware(app)
 			
 			server = Falcon::Server.new(middleware, endpoint)
@@ -47,6 +47,8 @@ RSpec.shared_context "server" do
 	end
 	
 	after do
-		server_task.stop
+		@server_task.stop
 	end
+	
+	let(:endpoint) {@endpoint}
 end

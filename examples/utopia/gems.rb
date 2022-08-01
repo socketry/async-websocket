@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 group :preload do
-	gem 'utopia', '~> 2.18.3'
+	gem 'utopia', '~> 2.20.0'
 	# gem 'utopia-gallery'
 	# gem 'utopia-analytics'
 	
@@ -22,6 +22,7 @@ gem 'rake'
 gem 'bake'
 gem 'bundler'
 gem 'rack-test'
+gem 'net-smtp'
 
 group :development do
 	gem 'guard-falcon', require: false
