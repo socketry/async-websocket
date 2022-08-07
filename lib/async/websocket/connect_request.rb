@@ -24,8 +24,6 @@ require 'protocol/http/request'
 require 'protocol/http/headers'
 require 'protocol/websocket/headers'
 
-require 'async/http/body/stream'
-
 module Async
 	module WebSocket
 		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
