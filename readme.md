@@ -2,7 +2,7 @@
 
 An asynchronous websocket client/server implementation for [HTTP/1](https://tools.ietf.org/html/rfc6455) and [HTTP/2](https://tools.ietf.org/html/rfc8441).
 
-[![Development Status](https://github.com/socketry/async-websocket/workflows/Development/badge.svg)](https://github.com/socketry/async-websocket/actions?workflow=Development)
+[![Development Status](https://github.com/socketry/async-websocket/workflows/Test/badge.svg)](https://github.com/socketry/async-websocket/actions?workflow=Test)
 
 ## Usage
 
