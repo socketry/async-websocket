@@ -23,6 +23,7 @@
 require 'protocol/http/request'
 require 'protocol/http/headers'
 require 'protocol/websocket/headers'
+require 'protocol/http/body/readable'
 
 module Async
 	module WebSocket
@@ -64,7 +65,7 @@ module Async
 				end
 			end
 			
-			class Hijack < Async::HTTP::Body::Readable
+			class Hijack < Protocol::HTTP::Body::Readable
 				def initialize(request)
 					@request = request
 					@stream = nil
