@@ -24,14 +24,13 @@ require 'async/websocket/adapters/rack'
 
 require 'rack/test'
 require 'falcon/server'
-require 'falcon/adapters/rack'
 require 'async/http/endpoint'
 
 RSpec.describe Async::WebSocket::Adapters::Rack do
 	include_context Async::RSpec::Reactor
 	
 	let(:endpoint) {Async::HTTP::Endpoint.parse("http://localhost:7050")}
-	let(:app) {Rack::Builder.parse_file(File.expand_path('rack/config.ru', __dir__)).first}
+	let(:app) {Rack::Builder.parse_file(File.expand_path('rack/config.ru', __dir__))}
 	let(:server) {Falcon::Server.new(Falcon::Server.middleware(app), endpoint)}
 	let(:client) {Async::HTTP::Client.new(endpoint)}
 	

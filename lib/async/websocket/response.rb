@@ -30,7 +30,7 @@ module Async
 			def self.for(request, headers = nil, **options, &body)
 				if request.version =~ /http\/1/i
 					return UpgradeResponse.new(request, headers, **options, &body)
-				elsif request.version =~ /h2/i
+				elsif request.version =~ /http\/2/i
 					return ConnectResponse.new(request, headers, **options, &body)
 				end
 				

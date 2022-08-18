@@ -14,4 +14,4 @@ group :test do
 	gem "bake-test-external"
 end
 
-gem "falcon", path: "../falcon"
+gem "rack", "~> 3.0.0.beta1"

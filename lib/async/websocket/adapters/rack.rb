@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 require_relative 'http'
+require 'protocol/rack/request'
 
 module Async
 	module WebSocket
@@ -28,68 +29,28 @@ module Async
 			module Rack
 				include ::Protocol::WebSocket::Headers
 				
-				HTTP_SEC_WEBSOCKET_PROTOCOL = 'HTTP_SEC_WEBSOCKET_PROTOCOL'.freeze
-
-				def self.protocols(env)
-					if protocols = env['rack.protocol']
-						return Array(protocols)
-					elsif upgrade = env['HTTP_UPGRADE']
-						return upgrade.split(/\s*,\s*/)
-					end
-				end
-
 				def self.websocket?(env)
-					protocols(env).any?{|name| name.casecmp?(PROTOCOL)}
+					HTTP.websocket?(
+						::Protocol::Rack::Request[env]
+					)
 				end
-
-				def self.open(env, protocols: [], handler: Connection, &block)
-					if websocket?(env)
-						if requested_protocol = env[HTTP_SEC_WEBSOCKET_PROTOCOL]
-							protocol = (requested_protocol & protocols).first
+				
+				def self.open(env, **options, &block)
+					request = ::Protocol::Rack::Request[env]
+					env = nil
+					
+					if response = HTTP.open(request, **options, &block)
+						headers = response.headers.to_h
+						
+						if protocol = response.protocol
+							headers['rack.protocol'] = protocol
 						end
 						
-
-
-						if response = HTTP.open(request, **options, &block)
-							headers = response.headers
-							
-							if protocol = response.protocol
-								headers = Protocol::HTTP::Headers::Merged.new(headers, [
-									['rack.protocol', protocol]
-								])
-							end
-							
-							return [response.status, headers.to_h, response.body]
-						end
+						body = proc{|stream| response.body.call(stream)}
+						
+						return [response.status, headers.to_h, body]
 					end
 				end
-
-
-					if websocket?(request)
-						# Select websocket sub-protocol:
-						if requested_protocol = request.headers[SEC_WEBSOCKET_PROTOCOL]
-							protocol = (requested_protocol & protocols).first
-						end
-						
-						response = Response.for(request, headers, protocol: protocol, **options) do |stream|
-							# Once we get to this point, we no longer need to hold on to the response:
-							response = nil
-							
-							framer = Protocol::WebSocket::Framer.new(stream)
-							connection = handler.call(framer, protocol)
-							
-							yield connection
-							
-							connection.close unless connection.closed?
-						end
-						
-						# Once we get to this point, we no longer need to hold on to the request:
-						request = nil
-						
-						return response
-					end
-				end
-
 			end
 		end
 	end

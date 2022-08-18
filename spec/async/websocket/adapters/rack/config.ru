@@ -13,7 +13,7 @@ class ClosedLogger
 	def call(env)
 		response = @app.call(env)
 
-		response[2] = Rack::BoxyProxy.new(response[2]) do
+		response[2] = Rack::BodyProxy.new(response[2]) do
 			Console.logger.info(self, "Connection closed!")
 		end
 
