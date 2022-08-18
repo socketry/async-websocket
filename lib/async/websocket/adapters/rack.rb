@@ -37,18 +37,9 @@ module Async
 				
 				def self.open(env, **options, &block)
 					request = ::Protocol::Rack::Request[env]
-					env = nil
 					
 					if response = HTTP.open(request, **options, &block)
-						headers = response.headers.to_h
-						
-						if protocol = response.protocol
-							headers['rack.protocol'] = protocol
-						end
-						
-						body = proc{|stream| response.body.call(stream)}
-						
-						return [response.status, headers.to_h, body]
+						return Protocol::Rack::Adapter.make_response(env, response)
 					end
 				end
 			end
