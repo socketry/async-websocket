@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 
 require_relative 'http'
+require 'protocol/rack/request'
 
 module Async
 	module WebSocket
@@ -29,24 +30,16 @@ module Async
 				include ::Protocol::WebSocket::Headers
 				
 				def self.websocket?(env)
-					request = env['async.http.request'] and Array(request.protocol).include?(PROTOCOL)
+					HTTP.websocket?(
+						::Protocol::Rack::Request[env]
+					)
 				end
 				
 				def self.open(env, **options, &block)
-					if request = env['async.http.request']
-						env = nil
-						
-						if response = HTTP.open(request, **options, &block)
-							headers = response.headers
-							
-							if protocol = response.protocol
-								headers = Protocol::HTTP::Headers::Merged.new(headers, [
-									['rack.protocol', protocol]
-								])
-							end
-							
-							return [response.status, headers.to_h, response.body]
-						end
+					request = ::Protocol::Rack::Request[env]
+					
+					if response = HTTP.open(request, **options, &block)
+						return Protocol::Rack::Adapter.make_response(env, response)
 					end
 				end
 			end

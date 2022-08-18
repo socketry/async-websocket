@@ -13,3 +13,5 @@ group :test do
 	gem "bake-test"
 	gem "bake-test-external"
 end
+
+gem "rack", "~> 3.0.0.beta1"

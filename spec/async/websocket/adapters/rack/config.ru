@@ -5,6 +5,25 @@ require 'set'
 
 $connections = Set.new
 
+class ClosedLogger
+	def initialize(app)
+		@app = app
+	end
+
+	def call(env)
+		response = @app.call(env)
+
+		response[2] = Rack::BodyProxy.new(response[2]) do
+			Console.logger.info(self, "Connection closed!")
+		end
+
+		return response
+	end
+end
+
+# This wraps our response in a body proxy which ensures Falcon can handle the response not being an instance of `Protocol::HTTP::Body::Readable`.
+use ClosedLogger
+
 run lambda {|env|
 	Async::WebSocket::Adapters::Rack.open(env, protocols: ['ws']) do |connection|
 		$connections << connection

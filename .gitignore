@@ -11,3 +11,5 @@
 .rspec_status
 /gems.locked
 .covered.db
+
+/external/
