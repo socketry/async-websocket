@@ -19,8 +19,8 @@ Gem::Specification.new do |spec|
 	
 	spec.add_dependency "async-http", "~> 0.54"
 	spec.add_dependency "async-io", "~> 1.23"
-	spec.add_dependency "protocol-websocket", "~> 0.7.0"
 	spec.add_dependency "protocol-rack", "~> 0.1.1"
+	spec.add_dependency "protocol-websocket", "~> 0.7.0"
 	
 	spec.add_development_dependency "async-rspec"
 	spec.add_development_dependency "bundler"
