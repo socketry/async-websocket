@@ -24,8 +24,8 @@ require_relative 'request'
 require_relative 'connection'
 
 require 'protocol/websocket/headers'
-require 'protocol/http/middleware'
 require 'protocol/websocket/extensions'
+require 'protocol/http/middleware'
 
 require 'async/http/client'
 
@@ -109,6 +109,8 @@ module Async
 				stream = response.stream
 				
 				framer = Framer.new(pool, connection, stream)
+				
+				connection = nil
 				
 				if extension_headers = response.headers[SEC_WEBSOCKET_EXTENSIONS]
 					extensions.accept(extension_headers)
