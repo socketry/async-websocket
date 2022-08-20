@@ -35,6 +35,8 @@ run lambda {|env|
 					connection.flush
 				end
 			end
+		rescue => error
+			Console.logger.error(self, error)
 		ensure
 			$connections.delete(connection)
 		end
