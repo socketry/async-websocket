@@ -23,6 +23,8 @@
 require_relative '../connection'
 require_relative '../response'
 
+require 'protocol/websocket/extensions'
+
 module Async
 	module WebSocket
 		module Adapters
@@ -33,30 +35,24 @@ module Async
 					Array(request.protocol).any? { |e| e.casecmp?(PROTOCOL) }
 				end
 				
-				def self.open(request, headers: [], protocols: [], extensions: nil, **options, &block)
+				def self.open(request, headers: [], protocols: [], handler: Connection, extensions: ::Protocol::WebSocket::Extensions::Server.default, **options, &block)
 					if websocket?(request)
+						headers = Protocol::HTTP::Headers[headers]
+						
 						# Select websocket sub-protocol:
 						if requested_protocol = request.headers[SEC_WEBSOCKET_PROTOCOL]
 							protocol = (requested_protocol & protocols).first
 						end
 						
-						klass = Connection
-						
-						extensions&.each do |extension|
-							# Given the request header which contains the "offer" by the client, configure the klass to suit.
-							klass = klass.negotiate(request.headers, klass, options)
+						if extensions and extension_headers = request.headers[SEC_WEBSOCKET_EXTENSIONS]
+							extensions.accept(extension_headers) do |header|
+								headers.add(SEC_WEBSOCKET_EXTENSIONS, header.join(";"))
+							end
 						end
-						
-						if extensions = request.headers[SEC_WEBSOCKET_EXTENSIONS]
-							extensions = handler.negotiate(requested_extensions)
-						end
-						
+											
 						response = Response.for(request, headers, protocol: protocol, **options) do |stream|
-							# Once we get to this point, we no longer need to hold on to the response:
-							response = nil
-							
 							framer = Protocol::WebSocket::Framer.new(stream)
-							connection = klass.call(framer, protocol, extensions)
+							connection = handler.call(framer, protocol, extensions)
 							
 							yield connection
 							

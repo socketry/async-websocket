@@ -22,6 +22,7 @@ require 'async/websocket'
 require 'async/websocket/client'
 require 'async/websocket/adapters/rack'
 
+require 'rack'
 require 'rack/test'
 require 'falcon/server'
 require 'async/http/endpoint'

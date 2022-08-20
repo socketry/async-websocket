@@ -25,6 +25,7 @@ require_relative 'connection'
 
 require 'protocol/websocket/headers'
 require 'protocol/http/middleware'
+require 'protocol/websocket/extensions'
 
 require 'async/http/client'
 
@@ -48,8 +49,8 @@ module Async
 			end
 			
 			# @return [Connection] an open websocket connection to the given endpoint.
-			def self.connect(endpoint, *args, **options, &block)
-				client = self.open(endpoint, *args)
+			def self.connect(endpoint, *arguments, **options, &block)
+				client = self.open(endpoint, *arguments)
 				connection = client.connect(endpoint.authority, endpoint.path, **options)
 					
 				return connection unless block_given?
@@ -86,12 +87,11 @@ module Async
 				end
 			end
 			
-			def connect(authority, path, headers: nil, extensions: nil, **options, &block)
+			def connect(authority, path, headers: nil, handler: Connection, extensions: ::Protocol::WebSocket::Extensions::Client.default, **options, &block)
 				headers = ::Protocol::HTTP::Headers[headers]
 				
-				# Prepare the request headers with any required extensions:
-				extensions&.each do |extension|
-					extension.client_offer(headers)
+				extensions&.offer do |extension|
+					headers.add(SEC_WEBSOCKET_EXTENSIONS, extension.join("; "))
 				end
 				
 				request = Request.new(nil, authority, path, headers, **options)
@@ -107,19 +107,17 @@ module Async
 				
 				protocol = response.headers[SEC_WEBSOCKET_PROTOCOL]&.first
 				stream = response.stream
-				response = nil
 				
 				framer = Framer.new(pool, connection, stream)
-				connection = nil
 				
-				klass = Connection
-				options = @options.dup
-				
-				extensions&.each do |extension|
-					klass = extension.apply(response.headers, klass, options)
+				if extension_headers = response.headers[SEC_WEBSOCKET_EXTENSIONS]
+					extensions.accept(extension_headers)
 				end
 				
-				connection = klass.call(framer, protocol, **options, &block)
+				response = nil
+				stream = nil
+				
+				connction = handler.call(framer, protocol, extensions, **@options, &block)
 			ensure
 				pool.release(connection) if connection
 			end

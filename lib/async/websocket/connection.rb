@@ -31,8 +31,10 @@ module Async
 		class Connection < ::Protocol::WebSocket::Connection
 			include ::Protocol::WebSocket::Headers
 			
-			def self.call(framer, protocol = [], **options)
+			def self.call(framer, protocol = [], extensions = nil, **options)
 				instance = self.new(framer, Array(protocol).first, **options)
+				
+				extensions&.apply(instance)
 				
 				return instance unless block_given?
 				
@@ -48,6 +50,10 @@ module Async
 				
 				@protocol = protocol
 				@response = response
+			end
+			
+			def reusable?
+				false
 			end
 			
 			def close
