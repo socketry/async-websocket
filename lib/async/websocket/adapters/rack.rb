@@ -22,6 +22,7 @@
 
 require_relative 'http'
 require 'protocol/rack/request'
+require 'protocol/rack/adapter'
 
 module Async
 	module WebSocket
