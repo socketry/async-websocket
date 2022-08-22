@@ -15,14 +15,15 @@ on 'connect' do |request|
 				while true
 					type, name, message = context.listen
 					
-					connection.write(JSON.parse(message))
+					# The message is text, but contains JSON.
+					connection.send_text(message)
 					connection.flush
 				end
 			end
 		end
 		
 		while message = connection.read
-			client.publish(channel, JSON.dump(message))
+			client.publish(channel, message.buffer)
 		end
 	ensure
 		subscription_task&.stop
