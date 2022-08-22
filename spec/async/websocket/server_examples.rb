@@ -18,8 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'protocol/websocket/json_message'
+
 require 'async/websocket/client'
 require 'async/websocket/server'
+require 'async/websocket/adapters/http'
 
 require 'async/http/client'
 require 'async/http/server'
@@ -52,23 +55,14 @@ RSpec.shared_context Async::WebSocket::Server do
 	let(:handler) {Async::WebSocket::Connection}
 	let(:headers) {Array.new}
 	
-	let(:message) {["Hello World"]}
+	let(:message) {"Hello World"}
 	
 	let(:server) do
 		Async::HTTP::Server.for(bound_endpoint, protocol: protocol, scheme: endpoint.scheme) do |request|
-			if Async::WebSocket::Request.websocket?(request)
-				Async::WebSocket::Response.for(request, headers) do |stream|
-					framer = Protocol::WebSocket::Framer.new(stream)
-					
-					connection = handler.call(framer)
-					
-					connection.write(message)
-					
-					connection.close
-				end
-			else
-				Protocol::HTTP::Response[404, {}, []]
-			end
+			Async::WebSocket::Adapters::HTTP.open(request) do |connection|
+				connection.write(message)
+				connection.close
+			end or Protocol::HTTP::Response[404, {}, []]
 		end
 	end
 	
@@ -95,7 +89,8 @@ RSpec.shared_context Async::WebSocket::Server do
 						
 						connection = handler.call(framer)
 						
-						connection.write(request.headers.fields)
+						message = Protocol::WebSocket::JSONMessage.generate(request.headers.fields)
+						message.send(connection)						
 						
 						connection.close
 					end
@@ -109,7 +104,7 @@ RSpec.shared_context Async::WebSocket::Server do
 			connection = client.connect(endpoint.authority, "/headers", headers: headers)
 			
 			begin
-				expect(connection.read.to_h).to include(*headers.keys)
+				expect(Protocol::WebSocket::JSONMessage.wrap(connection.read).to_h).to include(*headers.keys)
 				expect(connection.read).to be_nil
 				expect(connection).to be_closed
 			ensure

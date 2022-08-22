@@ -55,7 +55,7 @@ RSpec.describe Async::WebSocket::Adapters::Rack do
 	end
 	
 	let(:message) do
-		{text: "Hello World"}
+		Protocol::WebSocket::JSONMessage.generate({text: "Hello World"})
 	end
 	
 	it "can make websocket connection to server" do

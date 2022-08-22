@@ -26,14 +26,14 @@ class Upgrade
 	end
 	
 	def call(env)
-		Async::WebSocket::Adapters::Rack.open(env, supported_protocols: ['ws']) do |connection|
+		Async::WebSocket::Adapters::Rack.open(env) do |connection|
 			read, write = IO.pipe
 			
 			Process.spawn("ls -lah", :out => write)
 			write.close
 			
 			read.each_line do |line|
-				connection.write({line: line})
+				connection.send_text(line)
 			end
 			
 			# Gracefully close the connection:
