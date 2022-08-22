@@ -67,24 +67,6 @@ module Async
 			
 			attr :protocol
 			
-			def read
-				if buffer = super
-					parse(buffer)
-				end
-			end
-			
-			def write(object)
-				super(dump(object))
-			end
-			
-			def parse(buffer)
-				JSON.parse(buffer, symbolize_names: true)
-			end
-			
-			def dump(object)
-				JSON.dump(object)
-			end
-			
 			def call
 				self.close
 			end
