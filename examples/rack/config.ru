@@ -3,10 +3,11 @@
 require 'async/websocket/adapters/rack'
 
 app = lambda do |env|
-	Async::WebSocket::Adapters::Rack.open(env) do |connection|
-		message = connection.read
-		connection.write message.reverse
-	end
+	response = Async::WebSocket::Adapters::Rack.open(env) do |connection|
+		while message = connection.read
+			connection.write message
+		end
+	end or [404, {}, []]
 end
 
 run app

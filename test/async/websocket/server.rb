@@ -24,92 +24,74 @@ require 'async/websocket/client'
 require 'async/websocket/server'
 require 'async/websocket/adapters/http'
 
-require 'async/http/client'
-require 'async/http/server'
-require 'async/http/endpoint'
+require 'sus/fixtures/async/http/server_context'
 
-require 'async/io/shared_endpoint'
-
-RSpec.shared_context Async::WebSocket::Server do
-	include_context Async::RSpec::Reactor
-	
-	let(:protocol) {described_class}
-	let(:endpoint) {Async::HTTP::Endpoint.parse('http://127.0.0.1:8008', reuse_port: true)}
-	
-	let!(:bound_endpoint) {Async::IO::SharedEndpoint.bound(endpoint)}
-	after{bound_endpoint.close}
-
-	let(:client) {Async::WebSocket::Client.open(endpoint, protocol: protocol)}
-	
-	let!(:server_task) do
-		reactor.async do
-			server.run
-		end
-	end
-	
-	after(:each) do
-		Console.logger.debug(server_task, "Closing server...")
-		server_task.stop
-	end
-	
-	let(:handler) {Async::WebSocket::Connection}
-	let(:headers) {Array.new}
+WebSocketServerExamples = Sus::Shared('a websocket server') do
+	include Sus::Fixtures::Async::HTTP::ServerContext
 	
 	let(:message) {"Hello World"}
 	
-	let(:server) do
-		Async::HTTP::Server.for(bound_endpoint, protocol: protocol, scheme: endpoint.scheme) do |request|
+	let(:app) do
+		Protocol::HTTP::Middleware.for do |request|
 			Async::WebSocket::Adapters::HTTP.open(request) do |connection|
-				connection.write(message)
+				connection.send_text(message)
 				connection.close
 			end or Protocol::HTTP::Response[404, {}, []]
 		end
 	end
 	
+	let(:websocket_client) {Async::WebSocket::Client.open(client_endpoint)}
+	
 	it "can establish connection" do
-		connection = client.connect(endpoint.authority, "/server")
+		connection = websocket_client.connect(endpoint.authority, "/server")
 		
 		begin
 			expect(connection.read).to be == message
 			expect(connection.read).to be_nil
-			expect(connection).to be_closed
+			expect(connection).to be(:closed?)
 		ensure
 			connection.close
 		end
 	end
 	
-	context "with headers" do
+	with "headers" do
 		let(:headers) {{"foo" => "bar"}}
 		
-		let(:server) do
-			Async::HTTP::Server.for(bound_endpoint, protocol: protocol, scheme: endpoint.scheme) do |request|
-				if Async::WebSocket::Request.websocket?(request)
-					Async::WebSocket::Response.for(request, headers) do |stream|
-						framer = Protocol::WebSocket::Framer.new(stream)
-						
-						connection = handler.call(framer)
-						
-						message = Protocol::WebSocket::JSONMessage.generate(request.headers.fields)
-						message.send(connection)						
-						
-						connection.close
-					end
-				else
-					Protocol::HTTP::Response[404, {}, []]
-				end
+		let(:app) do
+			Protocol::HTTP::Middleware.for do |request|
+				Async::WebSocket::Adapters::HTTP.open(request) do |connection|
+					message = Protocol::WebSocket::JSONMessage.generate(request.headers.fields)
+					message.send(connection)
+					
+					connection.close
+				end or Protocol::HTTP::Response[404, {}, []]
 			end
 		end
 		
 		it "can send headers" do
-			connection = client.connect(endpoint.authority, "/headers", headers: headers)
+			connection = websocket_client.connect(endpoint.authority, "/headers", headers: headers)
 			
 			begin
-				expect(Protocol::WebSocket::JSONMessage.wrap(connection.read).to_h).to include(*headers.keys)
+				json_message = Protocol::WebSocket::JSONMessage.wrap(connection.read)
+				
+				expect(json_message.to_h).to have_keys(*headers.keys)
 				expect(connection.read).to be_nil
-				expect(connection).to be_closed
+				expect(connection).to be(:closed?)
 			ensure
 				connection.close
 			end
 		end
 	end
+end
+
+describe Async::HTTP::Protocol::HTTP1 do
+	let(:protocol) {subject}
+	
+	it_behaves_like WebSocketServerExamples
+end
+
+describe Async::HTTP::Protocol::HTTP2 do
+	let(:protocol) {subject}
+	
+	it_behaves_like WebSocketServerExamples
 end

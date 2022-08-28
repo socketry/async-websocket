@@ -10,7 +10,8 @@ Async do |task|
 	endpoint = Async::HTTP::Endpoint.parse(URL)
 	
 	Async::WebSocket::Client.connect(endpoint) do |connection|
-		connection.write ["Hello", "World"]
+		connection.send_text("Hello World")
+		connection.flush
 		
 		while message = connection.read
 			p message

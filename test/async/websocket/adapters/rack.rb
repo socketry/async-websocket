@@ -21,34 +21,15 @@
 require 'async/websocket'
 require 'async/websocket/client'
 require 'async/websocket/adapters/rack'
+require 'rack_application'
 
-require 'rack'
-require 'rack/test'
-require 'falcon/server'
-require 'async/http/endpoint'
-
-RSpec.describe Async::WebSocket::Adapters::Rack do
-	include_context Async::RSpec::Reactor
-	
-	let(:endpoint) {Async::HTTP::Endpoint.parse("http://localhost:7050")}
-	let(:app) {Rack::Builder.parse_file(File.expand_path('rack/config.ru', __dir__))}
-	let(:server) {Falcon::Server.new(Falcon::Server.middleware(app), endpoint)}
-	let(:client) {Async::HTTP::Client.new(endpoint)}
-	
-	before do
-		@server_task = reactor.async do
-			server.run
-		end
-	end
-	
-	after do
-		@server_task.stop
-	end
+describe Async::WebSocket::Adapters::Rack do
+	include RackApplication
 	
 	it "can make non-websocket connection to server" do
 		response = client.get("/")
 		
-		expect(response).to be_success
+		expect(response).to be(:success?)
 		expect(response.read).to be == "Hello World"
 		
 		client.close
@@ -59,7 +40,7 @@ RSpec.describe Async::WebSocket::Adapters::Rack do
 	end
 	
 	it "can make websocket connection to server" do
-		Async::WebSocket::Client.connect(endpoint) do |connection|
+		Async::WebSocket::Client.connect(client_endpoint) do |connection|
 			connection.write(message)
 			
 			expect(connection.read).to be == message
@@ -69,15 +50,15 @@ RSpec.describe Async::WebSocket::Adapters::Rack do
 	end
 	
 	it "should use mask over insecure connection" do
-		expect(endpoint).to_not be_secure
+		expect(endpoint).not.to be(:secure?)
 		
-		Async::WebSocket::Client.connect(endpoint) do |connection|
-			expect(connection.mask).to_not be_nil
+		Async::WebSocket::Client.connect(client_endpoint) do |connection|
+			expect(connection.mask).not.to be_nil
 		end
 	end
 	
 	it "should negotiate protocol" do
-		Async::WebSocket::Client.connect(endpoint, protocols: ['ws']) do |connection|
+		Async::WebSocket::Client.connect(client_endpoint, protocols: ['ws']) do |connection|
 			expect(connection.protocol).to be == 'ws'
 		end
 	end

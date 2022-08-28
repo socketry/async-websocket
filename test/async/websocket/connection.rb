@@ -1,4 +1,4 @@
-# Copyright, 2019, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2012, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,26 +18,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/websocket/adapters/rack'
+require 'async/websocket/connection'
 
-class Upgrade
-	def initialize(app)
-		@app = app
-	end
+describe Async::WebSocket::Connection do
+	let(:framer) {Protocol::WebSocket::Framer.new(nil)}
+	let(:connection) {subject.new(framer)}
 	
-	def call(env)
-		Async::WebSocket::Adapters::Rack.open(env) do |connection|
-			read, write = IO.pipe
-			
-			Process.spawn("ls -lah", :out => write)
-			write.close
-			
-			read.each_line do |line|
-				connection.send_text(line)
+	it "should use mask if specified" do
+		mock(framer) do |mock|
+			mock.replace(:write_frame) do |frame|
+				expect(frame.mask).to be == connection.mask
 			end
-			
-			# Gracefully close the connection:
-			connection.close
-		end or @app.call(env)
+		end
+		
+		connection.send_text("Hello World")
 	end
 end

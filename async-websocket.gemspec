@@ -22,10 +22,8 @@ Gem::Specification.new do |spec|
 	spec.add_dependency "protocol-rack", "~> 0.1.1"
 	spec.add_dependency "protocol-websocket", "~> 0.9.1"
 	
-	spec.add_development_dependency "async-rspec"
 	spec.add_development_dependency "bundler"
 	spec.add_development_dependency "covered"
-	spec.add_development_dependency "falcon", "~> 0.34"
-	spec.add_development_dependency "rack-test"
-	spec.add_development_dependency "rspec", "~> 3.6"
+	spec.add_development_dependency "sus", "~> 0.12.0"
+	spec.add_development_dependency "sus-fixtures-async-http", "~> 0.2.3"
 end

@@ -49,8 +49,9 @@ module Async
 								headers.add(SEC_WEBSOCKET_EXTENSIONS, header.join(";"))
 							end
 						end
-											
+						
 						response = Response.for(request, headers, protocol: protocol, **options) do |stream|
+							
 							framer = Protocol::WebSocket::Framer.new(stream)
 							connection = handler.call(framer, protocol, extensions)
 							
