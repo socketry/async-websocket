@@ -8,6 +8,8 @@ require 'protocol/http/headers'
 require 'protocol/websocket/headers'
 require 'protocol/http/body/readable'
 
+require 'async/variable'
+
 module Async
 	module WebSocket
 		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
@@ -51,17 +53,19 @@ module Async
 			class Hijack < Protocol::HTTP::Body::Readable
 				def initialize(request)
 					@request = request
-					@stream = nil
+					@stream = Async::Variable.new
 				end
 				
 				def stream?
 					true
 				end
 				
-				attr :stream
+				def stream
+					@stream.value
+				end
 				
 				def call(stream)
-					@stream = stream
+					@stream.resolve(stream)
 				end
 			end
 			
