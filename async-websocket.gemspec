@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
 	
 	spec.homepage = "https://github.com/socketry/async-websocket"
 	
-	spec.files = Dir.glob('{lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
+	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
 	
 	spec.add_dependency "async-http", "~> 0.54"
 	spec.add_dependency "async-io", "~> 1.23"

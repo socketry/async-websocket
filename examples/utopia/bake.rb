@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Released under the MIT License.
+# Copyright, 2020-2022, by Samuel Williams.
+
 # Prepare the application for start/restart.
 def deploy
 	# This task is typiclly run after the site is updated but before the server is restarted.

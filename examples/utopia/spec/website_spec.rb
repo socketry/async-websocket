@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Released under the MIT License.
+# Copyright, 2018-2022, by Samuel Williams.
+
 require_relative 'website_context'
 
 # Learn about best practice specs from http://betterspecs.org
