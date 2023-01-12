@@ -64,6 +64,7 @@ module Async
 					
 					if @pool
 						@pool.release(@connection)
+						@pool.close
 						@pool = nil
 						@connection = nil
 					end
