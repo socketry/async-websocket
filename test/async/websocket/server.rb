@@ -15,56 +15,49 @@ require 'sus/fixtures/async/http/server_context'
 ServerExamples = Sus::Shared('a websocket server') do
 	let(:websocket_client) {Async::WebSocket::Client.open(client_endpoint)}
 	
-	with 'generic application' do
-		let(:message) {"Hello World"}
+	it "can establish connection" do
+		connection = websocket_client.connect(endpoint.authority, "/server")
+		
+		connection.send_text("Hello World!")
+		message = connection.read
+		expect(message.to_str).to be == "Hello World!"
+		
+		connection.close
+	end
+	
+	it "can establish connection with block" do
+		websocket_client.connect(endpoint.authority, "/server") do |connection|
+			connection.send_text("Hello World!")
+			message = connection.read
+			expect(message.to_str).to be == "Hello World!"
+		end
+	end
+	
+	with "headers" do
+		let(:headers) {{"foo" => "bar"}}
 		
 		let(:app) do
 			Protocol::HTTP::Middleware.for do |request|
 				Async::WebSocket::Adapters::HTTP.open(request) do |connection|
-					connection.send_text(message)
+					message = Protocol::WebSocket::JSONMessage.generate(request.headers.fields)
+					message.send(connection)
+					
 					connection.close
 				end or Protocol::HTTP::Response[404, {}, []]
 			end
 		end
 		
-		it "can establish connection" do
-			connection = websocket_client.connect(endpoint.authority, "/server")
+		it "can send headers" do
+			connection = websocket_client.connect(endpoint.authority, "/headers", headers: headers)
 			
 			begin
-				expect(connection.read).to be == message
+				json_message = Protocol::WebSocket::JSONMessage.wrap(connection.read)
+				
+				expect(json_message.to_h).to have_keys(*headers.keys)
 				expect(connection.read).to be_nil
 				expect(connection).to be(:closed?)
 			ensure
 				connection.close
-			end
-		end
-		
-		with "headers" do
-			let(:headers) {{"foo" => "bar"}}
-			
-			let(:app) do
-				Protocol::HTTP::Middleware.for do |request|
-					Async::WebSocket::Adapters::HTTP.open(request) do |connection|
-						message = Protocol::WebSocket::JSONMessage.generate(request.headers.fields)
-						message.send(connection)
-						
-						connection.close
-					end or Protocol::HTTP::Response[404, {}, []]
-				end
-			end
-			
-			it "can send headers" do
-				connection = websocket_client.connect(endpoint.authority, "/headers", headers: headers)
-				
-				begin
-					json_message = Protocol::WebSocket::JSONMessage.wrap(connection.read)
-					
-					expect(json_message.to_h).to have_keys(*headers.keys)
-					expect(connection.read).to be_nil
-					expect(connection).to be(:closed?)
-				ensure
-					connection.close
-				end
 			end
 		end
 	end
@@ -72,18 +65,21 @@ ServerExamples = Sus::Shared('a websocket server') do
 	with 'server middleware' do
 		let(:app) do
 			Protocol::HTTP::Middleware.build do
-				use Async::WebSocket::Server do |connection|
-					connection.send_text("Hello World")
+				use Async::WebSocket::Server, protocols: ['echo', 'baz'] do |connection|
+					connection.send_text("protocol: #{connection.protocol}")
 					connection.close
 				end
 			end
 		end
 		
-		it "can establish connection" do
-			connection = websocket_client.connect(endpoint.authority, "/server")
+		it "can establish connection with explicit protocol" do
+			connection = websocket_client.connect(endpoint.authority, "/server", protocols: ['echo', 'foo', 'bar'])
+			
+			# The negotiated protocol:
+			expect(connection.protocol).to be == 'echo'
 			
 			begin
-				expect(connection.read).to be == "Hello World"
+				expect(connection.read).to be == "protocol: echo"
 				expect(connection.read).to be_nil
 				expect(connection).to be(:closed?)
 			ensure
@@ -96,9 +92,30 @@ end
 describe Async::WebSocket::Server do
 	include Sus::Fixtures::Async::HTTP::ServerContext
 	
+	let(:app) do
+		Protocol::HTTP::Middleware.for do |request|
+			Async::WebSocket::Adapters::HTTP.open(request) do |connection|
+				while message = connection.read
+					connection.write(message)
+				end
+			end or Protocol::HTTP::Response[404, {}, []]
+		end
+	end
+	
 	with 'http/1' do
 		let(:protocol) {Async::HTTP::Protocol::HTTP1}
 		it_behaves_like ServerExamples
+		
+		it "fails with bad request if missing nounce" do
+			request = Protocol::HTTP::Request["GET", "/", {
+				"upgrade" => "websocket",
+				"connection" => "upgrade",
+			}]
+			
+			response = client.call(request)
+			
+			expect(response).to be(:bad_request?)
+		end
 	end
 	
 	with 'http/2' do

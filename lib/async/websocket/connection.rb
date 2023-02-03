@@ -41,10 +41,6 @@ module Async
 			end
 			
 			attr :protocol
-			
-			def call
-				self.close
-			end
 		end
 	end
 end

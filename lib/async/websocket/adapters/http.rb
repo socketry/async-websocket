@@ -35,7 +35,6 @@ module Async
 						end
 						
 						response = Response.for(request, headers, protocol: protocol, **options) do |stream|
-							
 							framer = Protocol::WebSocket::Framer.new(stream)
 							connection = handler.call(framer, protocol, extensions)
 							

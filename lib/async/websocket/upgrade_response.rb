@@ -19,16 +19,17 @@ module Async
 				if accept_nounce = request.headers[SEC_WEBSOCKET_KEY]&.first
 					headers.add(SEC_WEBSOCKET_ACCEPT, Nounce.accept_digest(accept_nounce))
 					status = 101
+					
+					if protocol
+						headers.add(SEC_WEBSOCKET_PROTOCOL, protocol)
+					end
+					
+					body = Async::HTTP::Body::Hijack.wrap(request, &block)
+					
+					super(request.version, 101, headers, body, PROTOCOL)
 				else
-					status = 400
+					super(request.version, 400, headers)
 				end
-				
-				if protocol
-					headers.add(SEC_WEBSOCKET_PROTOCOL, protocol)
-				end
-				
-				body = Async::HTTP::Body::Hijack.wrap(request, &block)
-				super(request.version, status, headers, body, PROTOCOL)
 			end
 		end
 	end
