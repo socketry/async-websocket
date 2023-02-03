@@ -18,11 +18,15 @@ ClientExamples = Sus::Shared("a websocket client") do
 	let(:timeout) {nil}
 	
 	it "can connect to a websocket server and close underlying client" do
-		connection = Async::WebSocket::Client.connect(client_endpoint)
-		connection.send_text("Hello World!")
-		message = connection.read
-		expect(message.to_str).to be == "Hello World!"
-		connection.close
+		Async do |task|
+			connection = Async::WebSocket::Client.connect(client_endpoint)
+			connection.send_text("Hello World!")
+			message = connection.read
+			expect(message.to_str).to be == "Hello World!"
+			
+			connection.close
+			expect(task.children).to be(:empty?)
+		end.wait
 	end
 end
 
