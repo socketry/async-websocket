@@ -12,6 +12,8 @@ require 'protocol/http/middleware'
 
 require 'async/http/client'
 
+require 'delegate'
+
 module Async
 	module WebSocket
 		# This is a basic synchronous websocket client:
@@ -31,13 +33,29 @@ module Async
 				end
 			end
 			
+			class ClientCloseDecorator < SimpleDelegator
+				def initialize(client, connection)
+					@client = client
+					super(connection)
+				end
+				
+				def close
+					super
+					
+					if @client
+						@client.close
+						@client = nil
+					end
+				end
+			end
+			
 			# @return [Connection] an open websocket connection to the given endpoint.
 			def self.connect(endpoint, *arguments, **options, &block)
 				client = self.open(endpoint, *arguments)
 				connection = client.connect(endpoint.authority, endpoint.path, **options)
-					
-				return connection unless block_given?
-					
+				
+				return ClientCloseDecorator.new(client, connection) unless block_given?
+				
 				begin
 					yield connection
 				ensure

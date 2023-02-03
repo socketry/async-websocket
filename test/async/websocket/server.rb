@@ -11,7 +11,7 @@ require 'async/websocket/adapters/http'
 
 require 'sus/fixtures/async/http/server_context'
 
-WebSocketServerExamples = Sus::Shared('a websocket server') do
+ServerExamples = Sus::Shared('a websocket server') do
 	include Sus::Fixtures::Async::HTTP::ServerContext
 	
 	let(:message) {"Hello World"}
@@ -72,11 +72,11 @@ end
 describe Async::HTTP::Protocol::HTTP1 do
 	let(:protocol) {subject}
 	
-	it_behaves_like WebSocketServerExamples
+	it_behaves_like ServerExamples
 end
 
 describe Async::HTTP::Protocol::HTTP2 do
 	let(:protocol) {subject}
 	
-	it_behaves_like WebSocketServerExamples
+	it_behaves_like ServerExamples
 end
