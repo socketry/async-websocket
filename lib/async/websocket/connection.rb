@@ -30,24 +30,14 @@ module Async
 				end
 			end
 			
-			def initialize(framer, protocol = nil, response: nil, **options)
+			def initialize(framer, protocol = nil, **options)
 				super(framer, **options)
 				
 				@protocol = protocol
-				@response = response
 			end
 			
 			def reusable?
 				false
-			end
-			
-			def close
-				super
-				
-				if @response
-					@response.finish
-					@response = nil
-				end
 			end
 			
 			attr :protocol
