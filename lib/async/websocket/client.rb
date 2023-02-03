@@ -120,7 +120,7 @@ module Async
 				response = nil
 				stream = nil
 				
-				connction = handler.call(framer, protocol, extensions, **@options, &block)
+				return handler.call(framer, protocol, extensions, **@options, &block)
 			ensure
 				pool.release(connection) if connection
 			end

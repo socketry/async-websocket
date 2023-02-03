@@ -14,7 +14,7 @@ class ClosedLogger
 		response = @app.call(env)
 
 		response[2] = Rack::BodyProxy.new(response[2]) do
-			Console.logger.info(self, "Connection closed!")
+			Console.logger.debug(self, "Connection closed!")
 		end
 
 		return response

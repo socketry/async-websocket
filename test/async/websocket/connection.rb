@@ -9,6 +9,10 @@ describe Async::WebSocket::Connection do
 	let(:framer) {Protocol::WebSocket::Framer.new(nil)}
 	let(:connection) {subject.new(framer)}
 	
+	it "is not reusable" do
+		expect(connection).not.to be(:reusable?)
+	end
+	
 	it "should use mask if specified" do
 		mock(framer) do |mock|
 			mock.replace(:write_frame) do |frame|

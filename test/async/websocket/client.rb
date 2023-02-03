@@ -31,11 +31,11 @@ ClientExamples = Sus::Shared("a websocket client") do
 end
 
 describe Async::WebSocket::Client do
-	with "h1", protocol: Async::HTTP::Protocol::HTTP1 do
+	with "http/1", protocol: Async::HTTP::Protocol::HTTP1 do
 		it_behaves_like ClientExamples
 	end
 
-	with "h2", protocol: Async::HTTP::Protocol::HTTP2 do
+	with "http/2", protocol: Async::HTTP::Protocol::HTTP2 do
 		it_behaves_like ClientExamples
 	end
 end
