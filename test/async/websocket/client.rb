@@ -1,4 +1,11 @@
+# frozen_string_literal: true
 
+# Released under the MIT License.
+# Copyright, 2023, by Samuel Williams.
+
+require 'async/websocket/client'
+
+require 'sus/fixtures/async/http/server_context'
 
 ClientExamples = Sus::Shared("a websocket client") do
 	let(:app) do
@@ -23,6 +30,20 @@ ClientExamples = Sus::Shared("a websocket client") do
 			connection.close
 			expect(task.children).to be(:empty?)
 		end.wait
+	end
+	
+	with 'missing support for websockets' do
+		let(:app) do
+			Protocol::HTTP::Middleware.for do |request|
+				Protocol::HTTP::Response[404, {}, []]
+			end
+		end
+		
+		it "raises an error when the server doesn't support websockets" do
+			expect do
+				Async::WebSocket::Client.connect(client_endpoint) {}
+			end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Failed to negotiate connection/)
+		end
 	end
 end
 

@@ -20,13 +20,14 @@ module Async
 			class Wrapper
 				def initialize(stream, response)
 					@response = response
-					@body = @response.body
 					@stream = stream
 				end
 				
-				attr_accessor :response
+				def close
+					@response.close
+				end
 				
-				attr_accessor :body
+				attr_accessor :response
 				attr_accessor :stream
 				
 				def stream?
@@ -39,14 +40,6 @@ module Async
 				
 				def headers
 					@response.headers
-				end
-				
-				def body?
-					true
-				end
-				
-				def protocol
-					@response.protocol
 				end
 			end
 			

@@ -19,7 +19,7 @@ module Async
 					return ConnectResponse.new(request, headers, **options, &body)
 				end
 				
-				raise ProtocolError, "Unsupported HTTP version: #{request.version}!"
+				raise UnsupportedVersionError, "Unsupported HTTP version: #{request.version}!"
 			end
 		end
 	end

@@ -13,8 +13,6 @@ require 'async/websocket/adapters/http'
 require 'sus/fixtures/async/http/server_context'
 
 ServerExamples = Sus::Shared('a websocket server') do
-	let(:websocket_client) {Async::WebSocket::Client.open(client_endpoint)}
-	
 	it "can establish connection" do
 		connection = websocket_client.connect(endpoint.authority, "/server")
 		
@@ -102,6 +100,8 @@ end
 describe Async::WebSocket::Server do
 	include Sus::Fixtures::Async::HTTP::ServerContext
 	
+	let(:websocket_client) {Async::WebSocket::Client.open(client_endpoint)}
+	
 	let(:app) do
 		Protocol::HTTP::Middleware.for do |request|
 			Async::WebSocket::Adapters::HTTP.open(request) do |connection|
@@ -114,7 +114,7 @@ describe Async::WebSocket::Server do
 	
 	with 'http/1' do
 		let(:protocol) {Async::HTTP::Protocol::HTTP1}
-		it_behaves_like ServerExamples
+		it_behaves_like ServerExamples 
 		
 		it "fails with bad request if missing nounce" do
 			request = Protocol::HTTP::Request["GET", "/", {
@@ -125,6 +125,34 @@ describe Async::WebSocket::Server do
 			response = client.call(request)
 			
 			expect(response).to be(:bad_request?)
+		end
+		
+		let(:timeout) {nil}
+		
+		with 'broken server' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |request|
+					response = Async::WebSocket::Adapters::HTTP.open(request) do |connection|
+						while message = connection.read
+							connection.write(message)
+						end
+					end
+					
+					if response
+						response.tap do
+							response.headers.set('sec-websocket-accept', '2badsheep')
+						end
+					else
+						Protocol::HTTP::Response[404, {}, []]
+					end
+				end
+			end
+			
+			it "fails with protocol error if nounce doesn't match" do
+				expect do
+					websocket_client.connect(endpoint.authority, "/server") {}
+				end.to raise_exception(Protocol::WebSocket::ProtocolError)
+			end
 		end
 	end
 	

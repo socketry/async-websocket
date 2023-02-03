@@ -25,6 +25,10 @@ module Async
 					@stream = nil
 				end
 				
+				def close
+					@response.close
+				end
+				
 				attr_accessor :response
 				
 				def stream?
@@ -37,18 +41,6 @@ module Async
 				
 				def headers
 					@response.headers
-				end
-				
-				def body?
-					false
-				end
-				
-				def body
-					nil
-				end
-				
-				def protocol
-					@response.protocol
 				end
 				
 				def stream

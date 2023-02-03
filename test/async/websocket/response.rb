@@ -11,6 +11,6 @@ describe Async::WebSocket::Response do
 		
 		expect do
 			subject.for(request)
-		end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Unsupported HTTP version/)
+		end.to raise_exception(Async::WebSocket::UnsupportedVersionError, message: be =~ /Unsupported HTTP version/)
 	end
 end

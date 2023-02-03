@@ -103,6 +103,8 @@ module Async
 				response = request.call(connection)
 				
 				unless response.stream?
+					response.close
+					
 					raise ProtocolError, "Failed to negotiate connection: #{response.status}"
 				end
 				

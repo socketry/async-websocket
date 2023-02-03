@@ -9,5 +9,11 @@ module Async
 	module WebSocket
 		class ProtocolError < ::Protocol::WebSocket::ProtocolError
 		end
+		
+		class Error < ::Protocol::WebSocket::Error
+		end
+		
+		class UnsupportedVersionError < Error
+		end
 	end
 end

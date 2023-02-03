@@ -5,6 +5,7 @@
 
 require_relative 'connect_request'
 require_relative 'upgrade_request'
+require_relative 'error'
 
 module Async
 	module WebSocket
@@ -26,6 +27,10 @@ module Async
 				@body = nil
 			end
 			
+			def protocol
+				PROTOCOL
+			end
+			
 			attr_accessor :scheme
 			attr_accessor :authority
 			attr_accessor :path
@@ -41,7 +46,7 @@ module Async
 					return ConnectRequest.new(self, **@options).call(connection)
 				end
 				
-				raise HTTP::Error, "Unsupported HTTP version: #{connection.version}!"
+				raise UnsupportedVersionError, "Unsupported HTTP version: #{connection.version}!"
 			end
 			
 			def idempotent?
@@ -49,7 +54,8 @@ module Async
 			end
 			
 			def to_s
-				"\#<#{self.class} #{@scheme}://#{@authority}: #{@path}>"
+				uri = "#{@scheme}://#{@authority}#{@path}"
+				"\#<#{self.class} uri=#{uri.inspect}>"
 			end
 		end
 	end
