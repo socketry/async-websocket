@@ -1,8 +1,6 @@
 
 
 ClientExamples = Sus::Shared("a websocket client") do
-	include Sus::Fixtures::Async::HTTP::ServerContext
-	
 	let(:app) do
 		Protocol::HTTP::Middleware.for do |request|
 			Async::WebSocket::Adapters::HTTP.open(request) do |connection|
@@ -14,8 +12,6 @@ ClientExamples = Sus::Shared("a websocket client") do
 			end or Protocol::HTTP::Response[404, {}, []]
 		end
 	end
-	
-	let(:timeout) {nil}
 	
 	it "can connect to a websocket server and close underlying client" do
 		Async do |task|
@@ -31,11 +27,15 @@ ClientExamples = Sus::Shared("a websocket client") do
 end
 
 describe Async::WebSocket::Client do
-	with "http/1", protocol: Async::HTTP::Protocol::HTTP1 do
+	include Sus::Fixtures::Async::HTTP::ServerContext
+
+	with 'http/1' do
+		let(:protocol) {Async::HTTP::Protocol::HTTP1}
 		it_behaves_like ClientExamples
 	end
-
-	with "http/2", protocol: Async::HTTP::Protocol::HTTP2 do
+	
+	with 'http/2' do
+		let(:protocol) {Async::HTTP::Protocol::HTTP2}
 		it_behaves_like ClientExamples
 	end
 end
