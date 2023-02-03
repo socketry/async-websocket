@@ -24,6 +24,6 @@ Gem::Specification.new do |spec|
 	
 	spec.add_development_dependency "bundler"
 	spec.add_development_dependency "covered"
-	spec.add_development_dependency "sus", "~> 0.12.0"
+	spec.add_development_dependency "sus", "~> 0.16.0"
 	spec.add_development_dependency "sus-fixtures-async-http", "~> 0.2.3"
 end
