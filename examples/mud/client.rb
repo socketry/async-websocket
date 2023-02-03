@@ -3,6 +3,7 @@
 
 # Released under the MIT License.
 # Copyright, 2019-2022, by Samuel Williams.
+# Copyright, 2020, by Juan Antonio Martín Lucas.
 
 require 'async'
 require 'async/io/stream'

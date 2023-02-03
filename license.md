@@ -1,10 +1,14 @@
 # MIT License
 
-Copyright, 2015-2022, by Samuel Williams.  
+Copyright, 2015-2023, by Samuel Williams.  
+Copyright, 2019, by Bryan Powell.  
 Copyright, 2019, by destructobeam.  
+Copyright, 2019, by Michel Boaventura.  
+Copyright, 2019, by Janko Marohnić.  
+Copyright, 2020-2021, by Olle Jonsson.  
+Copyright, 2020, by Juan Antonio Martín Lucas.  
 Copyright, 2021, by Gleb Sinyavskiy.  
-Copyright, 2021, by Aurora.  
-Copyright, 2021, by Olle Jonsson.  
+Copyright, 2021, by Aurora Nockert.  
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
