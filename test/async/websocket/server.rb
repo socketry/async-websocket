@@ -33,6 +33,16 @@ ServerExamples = Sus::Shared('a websocket server') do
 		end
 	end
 	
+	it "can open client and establish client with block" do
+		Async::WebSocket::Client.open(client_endpoint) do |client|
+			client.connect(endpoint.authority, "/server") do |connection|
+				connection.send_text("Hello World!")
+				message = connection.read
+				expect(message.to_str).to be == "Hello World!"
+			end
+		end
+	end
+	
 	with "headers" do
 		let(:headers) {{"foo" => "bar"}}
 		
