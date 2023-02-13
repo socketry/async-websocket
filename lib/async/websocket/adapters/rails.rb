@@ -11,15 +11,10 @@ module Async
 			module Rails
 				def self.open(request, **options, &block)
 					if response = Rack.open(request.env, **options, &block)
-						response[1]['rack.hijack'] = lambda do |stream|
-							response[2].call(stream)
-						end
-						
-						# Close the response to prevent Rails from... trying to render a view?
-						return ::ActionDispatch::Response.new(response[0], response[1], nil).tap(&:close)
+						::Rack::Response[*response]
+					else
+						::ActionDispatch::Response.new(404, [], [])
 					end
-					
-					return ::ActionDispatch::Response.new(404, [], [])
 				end
 			end
 		end
