@@ -19,4 +19,4 @@ group :test do
 	gem "bake-test-external"
 end
 
-gem "rack", "~> 3.0.0"
+# gem "protocol-websocket", path: "../protocol-websocket"
