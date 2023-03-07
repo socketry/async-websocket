@@ -20,16 +20,30 @@ ClientExamples = Sus::Shared("a websocket client") do
 		end
 	end
 	
-	it "can connect to a websocket server and close underlying client" do
-		Async do |task|
-			connection = Async::WebSocket::Client.connect(client_endpoint)
-			connection.send_text("Hello World!")
-			message = connection.read
-			expect(message.to_str).to be == "Hello World!"
-			
-			connection.close
-			expect(task.children).to be(:empty?)
-		end.wait
+	with '#close' do
+		it "can connect to a websocket server and close underlying client" do
+			Async do |task|
+				connection = Async::WebSocket::Client.connect(client_endpoint)
+				connection.send_text("Hello World!")
+				message = connection.read
+				expect(message.to_str).to be == "Hello World!"
+				
+				connection.close
+				expect(task.children).to be(:empty?)
+			end.wait
+		end
+		
+		it "can connect to a websocket server and close underlying client with an error code" do
+			Async do |task|
+				connection = Async::WebSocket::Client.connect(client_endpoint)
+				connection.send_text("Hello World!")
+				message = connection.read
+				expect(message.to_str).to be == "Hello World!"
+				
+				connection.close(Protocol::WebSocket::Error::GOING_AWAY, "Bye!")
+				expect(task.children).to be(:empty?)
+			end.wait
+		end
 	end
 	
 	with 'missing support for websockets' do
