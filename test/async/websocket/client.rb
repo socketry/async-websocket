@@ -38,6 +38,8 @@ ClientExamples = Sus::Shared("a websocket client") do
 			
 			expect(messages.size).to be == 3
 			expect(connection).to be(:closed?)
+		ensure
+			connection&.close
 		end
 	end
 	
