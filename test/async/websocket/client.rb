@@ -110,6 +110,34 @@ describe Async::WebSocket::Client do
 	with 'http/1' do
 		let(:protocol) {Async::HTTP::Protocol::HTTP1}
 		it_behaves_like ClientExamples
+		
+		with 'invalid sec-websocket-accept header' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |request|
+					Protocol::HTTP::Response[101, {'sec-websocket-accept'=>'wrong-digest'}, []]
+				end
+			end
+			
+			it 'raises an error' do
+				expect do
+					Async::WebSocket::Client.connect(client_endpoint) {}
+				end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Invalid accept digest/)
+			end
+		end
+			
+		with 'missing sec-websocket-accept header' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |request|
+					Protocol::HTTP::Response[101, {}, []]
+				end
+			end
+			
+			it 'raises an error' do
+				expect do
+					Async::WebSocket::Client.connect(client_endpoint) {}
+				end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Failed to negotiate connection/)
+			end
+		end
 	end
 	
 	with 'http/2' do

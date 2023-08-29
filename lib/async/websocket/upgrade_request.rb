@@ -20,9 +20,10 @@ module Async
 			include ::Protocol::WebSocket::Headers
 			
 			class Wrapper
-				def initialize(response)
+				def initialize(response, verified:)
 					@response = response
 					@stream = nil
+					@verified = verified
 				end
 				
 				def close
@@ -32,7 +33,7 @@ module Async
 				attr_accessor :response
 				
 				def stream?
-					@response.status == 101
+					@response.status == 101 && @verified
 				end
 				
 				def status
@@ -74,7 +75,7 @@ module Async
 					end
 				end
 				
-				return Wrapper.new(response)
+				return Wrapper.new(response, verified: !!accept_digest)
 			end
 		end
 	end
