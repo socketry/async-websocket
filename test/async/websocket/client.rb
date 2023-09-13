@@ -186,5 +186,15 @@ describe Async::WebSocket::Client do
 	with 'http/2' do
 		let(:protocol) {Async::HTTP::Protocol::HTTP2}
 		it_behaves_like ClientExamples
+		
+		with 'invalid status' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |request|
+					Protocol::HTTP::Response[403, {}, []]
+				end
+			end
+			
+			it_behaves_like FailedToNegotiate
+		end
 	end
 end

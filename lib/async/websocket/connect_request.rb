@@ -12,7 +12,7 @@ require 'async/variable'
 
 module Async
 	module WebSocket
-		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
+		# This is required for HTTP/2 to establish a connection using the WebSocket protocol.
 		# See https://tools.ietf.org/html/rfc8441 for more details.
 		class ConnectRequest < ::Protocol::HTTP::Request
 			include ::Protocol::WebSocket::Headers
