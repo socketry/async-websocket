@@ -90,14 +90,14 @@ module Async
 				end
 			end
 			
-			def connect(authority, path, headers: nil, handler: Connection, extensions: ::Protocol::WebSocket::Extensions::Client.default, **options, &block)
+			def connect(authority, path, scheme: @delegate.scheme, headers: nil, handler: Connection, extensions: ::Protocol::WebSocket::Extensions::Client.default, **options, &block)
 				headers = ::Protocol::HTTP::Headers[headers]
 				
 				extensions&.offer do |extension|
 					headers.add(SEC_WEBSOCKET_EXTENSIONS, extension.join("; "))
 				end
 				
-				request = Request.new(nil, authority, path, headers, **options)
+				request = Request.new(scheme, authority, path, headers, **options)
 				
 				pool = @delegate.pool
 				connection = pool.acquire
