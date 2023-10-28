@@ -18,7 +18,6 @@ module Async
 				
 				if accept_nounce = request.headers[SEC_WEBSOCKET_KEY]&.first
 					headers.add(SEC_WEBSOCKET_ACCEPT, Nounce.accept_digest(accept_nounce))
-					status = 101
 					
 					if protocol
 						headers.add(SEC_WEBSOCKET_PROTOCOL, protocol)
