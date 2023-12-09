@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
 	spec.version = Async::WebSocket::VERSION
 	
 	spec.summary = "An async websocket library on top of websocket-driver."
-	spec.authors = ["Samuel Williams", "destructobeam", "Olle Jonsson", "Aurora Nockert", "Bryan Powell", "Gleb Sinyavskiy", "Janko Marohnić", "Juan Antonio Martín Lucas", "Michel Boaventura"]
+	spec.authors = ["Samuel Williams", "destructobeam", "Olle Jonsson", "Thomas Morgan", "Aurora Nockert", "Bryan Powell", "Emily Love Mills", "Gleb Sinyavskiy", "Janko Marohnić", "Juan Antonio Martín Lucas", "Michel Boaventura", "Peter Runich"]
 	spec.license = "MIT"
 	
 	spec.cert_chain  = ['release.cert']
@@ -17,13 +17,10 @@ Gem::Specification.new do |spec|
 	
 	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
 	
+	spec.required_ruby_version = ">= 3.0"
+	
 	spec.add_dependency "async-http", "~> 0.54"
 	spec.add_dependency "async-io", "~> 1.23"
 	spec.add_dependency "protocol-rack", "~> 0.1"
 	spec.add_dependency "protocol-websocket", "~> 0.11"
-	
-	spec.add_development_dependency "bundler"
-	spec.add_development_dependency "covered"
-	spec.add_development_dependency "sus", "~> 0.18"
-	spec.add_development_dependency "sus-fixtures-async-http", "~> 0.2.3"
 end
