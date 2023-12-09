@@ -2,6 +2,7 @@
 
 # Released under the MIT License.
 # Copyright, 2019-2023, by Samuel Williams.
+# Copyright, 2023, by Thomas Morgan.
 
 require 'protocol/http/request'
 require 'protocol/http/headers'

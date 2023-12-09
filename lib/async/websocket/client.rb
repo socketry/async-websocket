@@ -4,6 +4,7 @@
 # Copyright, 2015-2023, by Samuel Williams.
 # Copyright, 2019, by Bryan Powell.
 # Copyright, 2019, by Janko Marohnić.
+# Copyright, 2023, by Thomas Morgan.
 
 require_relative 'request'
 require_relative 'connection'
