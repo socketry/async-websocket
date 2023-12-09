@@ -13,7 +13,7 @@ module Async
 					if response = Rack.open(request.env, **options, &block)
 						::Rack::Response[*response]
 					else
-						::ActionDispatch::Response.new(404, [], [])
+						::ActionDispatch::Response.new(404)
 					end
 				end
 			end
