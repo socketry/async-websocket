@@ -1,2 +1,4 @@
 getting-started:
   order: 1
+rails-integration:
+  order: 2

@@ -15,6 +15,11 @@ Gem::Specification.new do |spec|
 	
 	spec.homepage = "https://github.com/socketry/async-websocket"
 	
+	spec.metadata = {
+		"documentation_uri" => "https://socketry.github.io/async-websocket/",
+		"funding_uri" => "https://github.com/sponsors/ioquatix",
+	}
+	
 	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
 	
 	spec.required_ruby_version = ">= 3.0"
