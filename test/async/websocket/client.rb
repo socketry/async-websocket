@@ -2,6 +2,7 @@
 
 # Released under the MIT License.
 # Copyright, 2023, by Samuel Williams.
+# Copyright, 2023, by Thomas Morgan.
 
 require 'async/websocket/client'
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2015-2022, by Samuel Williams.
+# Copyright, 2015-2023, by Samuel Williams.
 
 source 'https://rubygems.org'
 
@@ -20,3 +20,8 @@ group :test do
 end
 
 # gem "protocol-websocket", path: "../protocol-websocket"
+
+# Moved Development Dependencies
+gem "covered"
+gem "sus", "~> 0.18"
+gem "sus-fixtures-async-http", "~> 0.2.3"

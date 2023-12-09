@@ -9,6 +9,9 @@ Copyright, 2020-2021, by Olle Jonsson.
 Copyright, 2020, by Juan Antonio Martín Lucas.  
 Copyright, 2021, by Gleb Sinyavskiy.  
 Copyright, 2021, by Aurora Nockert.  
+Copyright, 2023, by Peter Runich.  
+Copyright, 2023, by Thomas Morgan.  
+Copyright, 2023, by Emily Love Mills.  
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
