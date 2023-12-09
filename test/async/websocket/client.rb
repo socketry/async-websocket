@@ -5,6 +5,7 @@
 # Copyright, 2023, by Thomas Morgan.
 
 require 'async/websocket/client'
+require 'async/websocket/adapters/http'
 
 require 'sus/fixtures/async/http/server_context'
 
@@ -87,6 +88,30 @@ ClientExamples = Sus::Shared("a websocket client") do
 			expect do
 				connection.read
 			end.to raise_exception(Protocol::WebSocket::Error).and(have_attributes(code: be == 1001))
+		end
+	end
+	
+	with '#connect' do
+		let(:app) do
+			Protocol::HTTP::Middleware.for do |request|
+				Async::WebSocket::Adapters::HTTP.open(request) do |connection|
+					connection.send_text("authority: #{request.authority}")
+					connection.send_text("path: #{request.path}")
+					connection.send_text("protocol: #{Array(request.protocol).inspect}")
+					connection.send_text("scheme: #{request.scheme}")
+					connection.close
+				end or Protocol::HTTP::Response[404, {}, []]
+			end
+		end
+		
+		it "fully populates the request" do
+			connection = Async::WebSocket::Client.connect(client_endpoint)
+			expect(connection.read.to_str).to be =~ /authority: localhost:\d+/
+			expect(connection.read.to_str).to be == 'path: /'
+			expect(connection.read.to_str).to be == 'protocol: ["websocket"]'
+			expect(connection.read.to_str).to be == 'scheme: http'
+		ensure
+			connection&.close
 		end
 	end
 	
