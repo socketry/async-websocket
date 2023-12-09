@@ -17,6 +17,7 @@ require_relative 'error'
 module Async
 	module WebSocket
 		# This is required for HTTP/1.x to upgrade the connection to the WebSocket protocol.
+		# See https://tools.ietf.org/html/rfc6455
 		class UpgradeRequest < ::Protocol::HTTP::Request
 			include ::Protocol::WebSocket::Headers
 			
@@ -75,8 +76,9 @@ module Async
 						raise ProtocolError, "Invalid accept digest, expected #{expected_accept_digest.inspect}, got #{accept_digest.inspect}!"
 					end
 				end
+				verified = accept_digest && Array(response.protocol) == %w(websocket) && response.headers['connection']&.include?('upgrade')
 				
-				return Wrapper.new(response, verified: !!accept_digest)
+				return Wrapper.new(response, verified: verified)
 			end
 		end
 	end

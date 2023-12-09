@@ -105,6 +105,14 @@ ClientExamples = Sus::Shared("a websocket client") do
 	end
 end
 
+FailedToNegotiate = Sus::Shared("a failed websocket request") do
+	it 'raises an error' do
+		expect do
+			Async::WebSocket::Client.connect(client_endpoint) {}
+		end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Failed to negotiate connection/)
+	end
+end
+
 describe Async::WebSocket::Client do
 	include Sus::Fixtures::Async::HTTP::ServerContext
 
@@ -112,10 +120,38 @@ describe Async::WebSocket::Client do
 		let(:protocol) {Async::HTTP::Protocol::HTTP1}
 		it_behaves_like ClientExamples
 		
+		def valid_headers(request)
+			{
+				'connection' => 'upgrade',
+				'upgrade' => 'websocket',
+				'sec-websocket-accept' => Protocol::WebSocket::Headers::Nounce.accept_digest(request.headers['sec-websocket-key'].first)
+			}
+		end
+		
+		with 'invalid connection header' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |request|
+					Protocol::HTTP::Response[101, valid_headers(request).except('connection'), []]
+				end
+			end
+			
+			it_behaves_like FailedToNegotiate
+		end
+		
+		with 'invalid upgrade header' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |request|
+					Protocol::HTTP::Response[101, valid_headers(request).except('upgrade'), []]
+				end
+			end
+			
+			it_behaves_like FailedToNegotiate
+		end
+		
 		with 'invalid sec-websocket-accept header' do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
-					Protocol::HTTP::Response[101, {'sec-websocket-accept'=>'wrong-digest'}, []]
+					Protocol::HTTP::Response[101, valid_headers(request).merge('sec-websocket-accept'=>'wrong-digest'), []]
 				end
 			end
 			
@@ -125,24 +161,40 @@ describe Async::WebSocket::Client do
 				end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Invalid accept digest/)
 			end
 		end
-			
+		
 		with 'missing sec-websocket-accept header' do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
-					Protocol::HTTP::Response[101, {}, []]
+					Protocol::HTTP::Response[101, valid_headers(request).except('sec-websocket-accept'), []]
 				end
 			end
 			
-			it 'raises an error' do
-				expect do
-					Async::WebSocket::Client.connect(client_endpoint) {}
-				end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Failed to negotiate connection/)
+			it_behaves_like FailedToNegotiate
+		end
+		
+		with 'invalid status' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |request|
+					Protocol::HTTP::Response[403, valid_headers(request), []]
+				end
 			end
+			
+			it_behaves_like FailedToNegotiate
 		end
 	end
 	
 	with 'http/2' do
 		let(:protocol) {Async::HTTP::Protocol::HTTP2}
 		it_behaves_like ClientExamples
+		
+		with 'invalid status' do
+			let(:app) do
+				Protocol::HTTP::Middleware.for do |request|
+					Protocol::HTTP::Response[403, {}, []]
+				end
+			end
+			
+			it_behaves_like FailedToNegotiate
+		end
 	end
 end
