@@ -24,4 +24,4 @@ end
 # Moved Development Dependencies
 gem "covered"
 gem "sus", "~> 0.18"
-gem "sus-fixtures-async-http", "~> 0.2.3"
+gem "sus-fixtures-async-http", "~> 0.8"
