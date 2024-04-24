@@ -7,7 +7,6 @@
 require 'async'
 require 'async/semaphore'
 require 'async/clock'
-require 'async/io/stream'
 require 'async/http/endpoint'
 require 'protocol/websocket/json_message'
 require_relative '../../lib/async/websocket/client'
@@ -28,7 +27,7 @@ class Command < Samovar::Command
 	
 	def local_address
 		if bind = @options[:bind]
-			Async::IO::Address.tcp(bind, 0)
+			Addrinfo.tcp(bind, 0)
 		end
 	end
 	

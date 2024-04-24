@@ -5,7 +5,6 @@
 # Copyright, 2020-2022, by Samuel Williams.
 
 require 'async'
-require 'async/io/stream'
 require 'async/http/endpoint'
 
 require 'hexdump'

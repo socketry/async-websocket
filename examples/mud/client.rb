@@ -6,7 +6,6 @@
 # Copyright, 2020, by Juan Antonio Martín Lucas.
 
 require 'async'
-require 'async/io/stream'
 require 'async/http/endpoint'
 require 'async/websocket/client'
 
@@ -14,17 +13,13 @@ USER = ARGV.pop || "anonymous"
 URL = ARGV.pop || "http://127.0.0.1:7070"
 
 Async do |task|
-	stdin = Async::IO::Stream.new(
-		Async::IO::Generic.new($stdin)
-	)
-	
 	endpoint = Async::HTTP::Endpoint.parse(URL)
 	
 	Async::WebSocket::Client.connect(endpoint) do |connection|
 		task.async do
 			$stdout.write "> "
 			
-			while line = stdin.read_until("\n")
+			while line = $stdin.gets
 				connection.write({input: line})
 				connection.flush
 				
