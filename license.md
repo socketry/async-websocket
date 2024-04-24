@@ -1,8 +1,8 @@
 # MIT License
 
-Copyright, 2015-2023, by Samuel Williams.  
+Copyright, 2015-2024, by Samuel Williams.  
 Copyright, 2019, by Bryan Powell.  
-Copyright, 2019, by destructobeam.  
+Copyright, 2019, by Simon Crocker.  
 Copyright, 2019, by Michel Boaventura.  
 Copyright, 2019, by Janko Marohnić.  
 Copyright, 2020-2021, by Olle Jonsson.  

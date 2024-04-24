@@ -2,7 +2,7 @@
 
 # Released under the MIT License.
 # Copyright, 2015-2023, by Samuel Williams.
-# Copyright, 2019, by destructobeam.
+# Copyright, 2019, by Simon Crocker.
 
 require 'async/websocket/connection'
 

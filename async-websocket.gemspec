@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
 	spec.name = "async-websocket"
 	spec.version = Async::WebSocket::VERSION
 	
-	spec.summary = "An async websocket library on top of websocket-driver."
-	spec.authors = ["Samuel Williams", "destructobeam", "Olle Jonsson", "Thomas Morgan", "Aurora Nockert", "Bryan Powell", "Emily Love Mills", "Gleb Sinyavskiy", "Janko Marohnić", "Juan Antonio Martín Lucas", "Michel Boaventura", "Peter Runich"]
+	spec.summary = "An async websocket library on top of protocol-websocket."
+	spec.authors = ["Samuel Williams", "Simon Crocker", "Olle Jonsson", "Thomas Morgan", "Aurora Nockert", "Bryan Powell", "Emily Love Mills", "Gleb Sinyavskiy", "Janko Marohnić", "Juan Antonio Martín Lucas", "Michel Boaventura", "Peter Runich"]
 	spec.license = "MIT"
 	
 	spec.cert_chain  = ['release.cert']
@@ -18,11 +18,12 @@ Gem::Specification.new do |spec|
 	spec.metadata = {
 		"documentation_uri" => "https://socketry.github.io/async-websocket/",
 		"funding_uri" => "https://github.com/sponsors/ioquatix",
+		"source_code_uri" => "https://github.com/socketry/async-websocket.git",
 	}
 	
 	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
 	
-	spec.required_ruby_version = ">= 3.0"
+	spec.required_ruby_version = ">= 3.1"
 	
 	spec.add_dependency "async-http", "~> 0.54"
 	spec.add_dependency "protocol-rack", "~> 0.5"

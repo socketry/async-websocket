@@ -2,7 +2,7 @@
 
 # Released under the MIT License.
 # Copyright, 2018-2023, by Samuel Williams.
-# Copyright, 2019, by destructobeam.
+# Copyright, 2019, by Simon Crocker.
 
 require_relative 'connection'
 require_relative 'response'
