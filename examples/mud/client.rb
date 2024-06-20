@@ -20,7 +20,7 @@ Async do |task|
 			$stdout.write "> "
 			
 			while line = $stdin.gets
-				connection.write({input: line})
+				connection.write(Protocol::WebSocket::TextMessage.generate({input: line}))
 				connection.flush
 				
 				$stdout.write "> "
@@ -28,7 +28,16 @@ Async do |task|
 		end
 		
 		while message = connection.read
-			$stdout.puts message
+			# Rewind to start of line:
+			$stdout.write "\r"
+			
+			# Clear line:
+			$stdout.write "\e[2K"
+			
+			# Print message:
+			$stdout.puts message.to_h
+			
+			$stdout.write "> "
 		end
 	end
 end

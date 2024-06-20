@@ -83,25 +83,28 @@ class User < Async::WebSocket::Connection
 		@name || ANONYMOUS
 	end
 	
+	def send_message(value)
+		self.write(Protocol::WebSocket::TextMessage.generate(value))
+	end
+	
 	def handle(message)
-		key, *arguments = Command.split(message[:input])
+		key, *arguments = Command.split(message.parse[:input])
 		case key
 		when "name"
 			@name = arguments.first
 		when "look"
-			self.write({room: @room.as_json})
+			self.send_message({room: @room.as_json})
 		else
 			if action = @room.actions[key]
 				action.call(self, *arguments)
 			else
-				message[:user]
 				@room.broadcast(message)
 			end
 		end
 	end
 	
 	def notify(text)
-		self.write({notify: text})
+		self.send_message({notify: text})
 		self.flush
 	end
 	
