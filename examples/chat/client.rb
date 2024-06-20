@@ -7,7 +7,6 @@
 require 'async'
 require 'async/http/endpoint'
 require_relative '../../lib/async/websocket/client'
-require 'protocol/websocket/json_message'
 
 USER = ARGV.pop || "anonymous"
 URL = ARGV.pop || "https://localhost:8080"
