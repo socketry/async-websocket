@@ -15,7 +15,7 @@ Async do |task|
 	
 	Async::WebSocket::Client.connect(endpoint) do |connection|
 		while message = connection.read
-			p message
+			$stdout.puts message.parse
 		end
 	end
 end
