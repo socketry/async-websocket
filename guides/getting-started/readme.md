@@ -37,10 +37,11 @@ Async do |task|
 			end
 		end
 		
-		connection.write({
+		# Generate a text message by geneating a JSON payload from a hash:
+		connection.write(Protocol::WebSocket::TextMessage.generate({
 			user: USER,
 			status: "connected",
-		})
+		}))
 		
 		while message = connection.read
 			puts message.inspect

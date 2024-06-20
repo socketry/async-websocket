@@ -54,16 +54,18 @@ module Async
 			
 			# @return [Connection] an open websocket connection to the given endpoint.
 			def self.connect(endpoint, *arguments, **options, &block)
-				client = self.open(endpoint, *arguments)
-				connection = client.connect(endpoint.authority, endpoint.path, **options)
-				
-				return ClientCloseDecorator.new(client, connection) unless block_given?
-				
-				begin
-					yield connection
-				ensure
-					connection.close
-					client.close
+				Sync do
+					client = self.open(endpoint, *arguments)
+					connection = client.connect(endpoint.authority, endpoint.path, **options)
+					
+					return ClientCloseDecorator.new(client, connection) unless block_given?
+					
+					begin
+						yield connection
+					ensure
+						connection.close
+						client.close
+					end
 				end
 			end
 			
@@ -79,6 +81,8 @@ module Async
 					@pool = pool
 					@connection = connection
 				end
+				
+				attr :connection
 				
 				def close
 					super

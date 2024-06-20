@@ -14,7 +14,7 @@ class ClosedLogger
 		response = @app.call(env)
 
 		response[2] = Rack::BodyProxy.new(response[2]) do
-			Console.logger.debug(self, "Connection closed!")
+			Console.debug(self, "Connection closed!")
 		end
 
 		return response
@@ -24,7 +24,7 @@ end
 # This wraps our response in a body proxy which ensures Falcon can handle the response not being an instance of `Protocol::HTTP::Body::Readable`.
 use ClosedLogger
 
-run lambda {|env|
+run do |env|
 	Async::WebSocket::Adapters::Rack.open(env, protocols: ['ws']) do |connection|
 		$connections << connection
 		
@@ -36,9 +36,9 @@ run lambda {|env|
 				end
 			end
 		rescue => error
-			Console.logger.error(self, error)
+			Console.error(self, error)
 		ensure
 			$connections.delete(connection)
 		end
 	end or [200, {}, ["Hello World"]]
-}
+end

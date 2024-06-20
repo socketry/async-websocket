@@ -7,7 +7,7 @@
 require 'async/websocket'
 require 'async/websocket/client'
 require 'async/websocket/adapters/rack'
-require 'rack_application'
+require 'async/websocket/rack_application'
 
 describe Async::WebSocket::Adapters::Rack do
 	it "can determine whether a rack env is a websocket request" do
@@ -16,7 +16,7 @@ describe Async::WebSocket::Adapters::Rack do
 	end
 	
 	with 'rack application' do
-		include RackApplication
+		include Async::WebSocket::RackApplication
 		
 		it "can make non-websocket connection to server" do
 			response = client.get("/")
@@ -28,7 +28,7 @@ describe Async::WebSocket::Adapters::Rack do
 		end
 		
 		let(:message) do
-			Protocol::WebSocket::JSONMessage.generate({text: "Hello World"})
+			Protocol::WebSocket::TextMessage.generate({text: "Hello World"})
 		end
 		
 		it "can make websocket connection to server" do

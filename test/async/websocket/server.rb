@@ -3,7 +3,6 @@
 # Released under the MIT License.
 # Copyright, 2019-2023, by Samuel Williams.
 
-require 'protocol/websocket/json_message'
 require 'protocol/http/middleware/builder'
 
 require 'async/websocket/client'
@@ -47,7 +46,7 @@ ServerExamples = Sus::Shared('a websocket server') do
 		let(:app) do
 			Protocol::HTTP::Middleware.for do |request|
 				Async::WebSocket::Adapters::HTTP.open(request) do |connection|
-					message = Protocol::WebSocket::JSONMessage.generate(request.headers.fields)
+					message = Protocol::WebSocket::TextMessage.generate(request.headers.fields)
 					message.send(connection)
 					
 					connection.close
@@ -59,9 +58,9 @@ ServerExamples = Sus::Shared('a websocket server') do
 			connection = websocket_client.connect(endpoint.authority, "/headers", headers: headers)
 			
 			begin
-				json_message = Protocol::WebSocket::JSONMessage.wrap(connection.read)
+				message = connection.read
 				
-				expect(json_message.to_h).to have_keys(*headers.keys)
+				expect(message.to_h).to have_keys(*headers.keys)
 				expect(connection.read).to be_nil
 				expect(connection).to be(:closed?)
 			ensure
