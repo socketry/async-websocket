@@ -14,11 +14,11 @@ Async do |task|
 	endpoint = Async::HTTP::Endpoint.parse(URL)
 	
 	Async::WebSocket::Client.connect(endpoint) do |connection|
-		connection.send_text("Hello World")
-		connection.flush
+		1000.times do
+			connection.send_text("Hello World")
+			connection.flush
 		
-		while message = connection.read
-			p message
+			puts connection.read
 		end
 	end
 end
