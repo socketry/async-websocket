@@ -110,12 +110,6 @@ require 'async/websocket/client'
 
 endpoint = Async::HTTP::Endpoint.parse("https://localhost:3000/home/index")
 
-Async do
-	internet = Async::HTTP::Internet.new
-	response = internet.connect("https://localhost:3000/home/index")
-	binding.irb
-end
-
 Async::WebSocket::Client.connect(endpoint) do |connection|
 	puts connection.framer.connection.class
 	# Async::HTTP::Protocol::HTTP2::Client
