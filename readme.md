@@ -10,7 +10,7 @@ Please see the [project documentation](https://socketry.github.io/async-websocke
 
   - [Getting Started](https://socketry.github.io/async-websocket/guides/getting-started/index) - This guide shows you how to implement a basic client and server.
 
-  - [Rails Integration](https://socketry.github.io/async-websocket/guides/rails-integration/index) - This guide explains how to use `async-websocket` with `falcon`.
+  - [Rails Integration](https://socketry.github.io/async-websocket/guides/rails-integration/index) - This guide explains how to use `async-websocket` with Rails.
 
 ## Contributing
 

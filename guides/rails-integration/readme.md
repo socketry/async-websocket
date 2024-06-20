@@ -1,6 +1,6 @@
 # Rails Integration
 
-This guide explains how to use `async-websocket` with `falcon`.
+This guide explains how to use `async-websocket` with Rails.
 
 ## Project Setup
 
