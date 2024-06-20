@@ -1,1 +1,0 @@
-This directory is required by Apache/Phusion Passenger and contains static assets that are typically served using sendfile.
