@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
 	spec.version = Async::WebSocket::VERSION
 	
 	spec.summary = "An async websocket library on top of protocol-websocket."
-	spec.authors = ["Samuel Williams", "Simon Crocker", "Olle Jonsson", "Thomas Morgan", "Aurora Nockert", "Bryan Powell", "Emily Love Mills", "Gleb Sinyavskiy", "Janko Marohnić", "Juan Antonio Martín Lucas", "Michel Boaventura", "Peter Runich"]
+	spec.authors = ["Samuel Williams", "Simon Crocker", "Olle Jonsson", "Thomas Morgan", "Aurora Nockert", "Bryan Powell", "Emily Love Mills", "Gleb Sinyavskiy", "Janko Marohnić", "Juan Antonio Martín Lucas", "Michel Boaventura", "Peter Runich", "Ryu Sato"]
 	spec.license = "MIT"
 	
 	spec.cert_chain  = ['release.cert']

@@ -12,6 +12,7 @@ Copyright, 2021, by Aurora Nockert.
 Copyright, 2023, by Peter Runich.  
 Copyright, 2023, by Thomas Morgan.  
 Copyright, 2023, by Emily Love Mills.  
+Copyright, 2024, by Ryu Sato.  
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
