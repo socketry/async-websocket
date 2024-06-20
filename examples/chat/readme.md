@@ -59,6 +59,8 @@ You can increase it:
 
 ## Logs
 
+### 2024
+
 ### 2020
 
 ```

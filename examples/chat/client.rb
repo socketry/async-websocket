@@ -17,7 +17,7 @@ Async do |task|
 	Async::WebSocket::Client.connect(ENDPOINT) do |connection|
 		input_task = task.async do
 			while line = $stdin.gets
-				message = Protocol::WebSocket::JSONMessage.generate({text: line})
+				message = Protocol::WebSocket::TextMessage.generate({text: line})
 				message.send(connection)
 				connection.flush
 			end
@@ -25,9 +25,7 @@ Async do |task|
 		
 		puts "Connected..."
 		while message = connection.read
-			if message = Protocol::WebSocket::JSONMessage.wrap(message)
-				puts "> #{message.to_h}"
-			end
+			puts "> #{message.to_h}"
 		end
 	ensure
 		input_task&.stop

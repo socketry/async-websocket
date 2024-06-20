@@ -3,7 +3,6 @@
 require_relative '../../lib/async/websocket/adapters/rack'
 require 'async/clock'
 require 'async/semaphore'
-require 'protocol/websocket/json_message'
 
 require 'set'
 
@@ -120,19 +119,19 @@ class Room
 		end
 		
 		while message = connection.read
-			event = Protocol::WebSocket::JSONMessage.wrap(message)&.to_h
+			event = message.to_h
 			
 			if event and event[:text] =~ /^\/(.*?)$/
 				begin
 					result = self.command($1)
 					
 					if result.is_a? Hash
-						Protocol::WebSocket::JSONMessage.generate(result).send(connection)
+						Protocol::WebSocket::TextMessage.generate(result).send(connection)
 					else
-						Protocol::WebSocket::JSONMessage.generate({result: result}).send(connection)
+						Protocol::WebSocket::TextMessage.generate({result: result}).send(connection)
 					end
 				rescue => error
-					Protocol::WebSocket::JSONMessage.generate({error: error}).send(connection)
+					Protocol::WebSocket::TextMessage.generate({error: error}).send(connection)
 				end
 			else
 				self.broadcast(message)

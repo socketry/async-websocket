@@ -8,7 +8,6 @@ require 'async'
 require 'async/semaphore'
 require 'async/clock'
 require 'async/http/endpoint'
-require 'protocol/websocket/json_message'
 require_relative '../../lib/async/websocket/client'
 
 require 'samovar'
@@ -44,9 +43,7 @@ class Command < Samovar::Command
 				while connection = connections.dequeue
 					subtask.async(connection) do |subtask, connection|
 						while message = connection.read
-							if message = Protocol::WebSocket::JSONMessage.wrap(message)
-								puts "> #{message.to_h}"
-							end
+							puts "> #{message.to_h}"
 						end
 					ensure
 						connection.close
