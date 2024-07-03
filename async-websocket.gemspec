@@ -27,5 +27,5 @@ Gem::Specification.new do |spec|
 	
 	spec.add_dependency "async-http", "~> 0.54"
 	spec.add_dependency "protocol-rack", "~> 0.5"
-	spec.add_dependency "protocol-websocket", "~> 0.14"
+	spec.add_dependency "protocol-websocket", "~> 0.15"
 end
