@@ -1,4 +1,5 @@
 #!/usr/bin/env -S falcon serve --bind http://localhost:7070 --count 1 -c
+# frozen_string_literal: true
 
 require 'async/websocket/adapters/rack'
 require 'set'
