@@ -15,5 +15,16 @@ module Async
 		
 		class UnsupportedVersionError < Error
 		end
+		
+		class ConnectionError < Error
+			def initialize(message, response)
+				super(message)
+				
+				@response = response
+			end
+			
+			# The failed HTTP response.
+			attr :response
+		end
 	end
 end

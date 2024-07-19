@@ -110,9 +110,7 @@ module Async
 				response = request.call(connection)
 				
 				unless response.stream?
-					response.close
-					
-					raise ProtocolError, "Failed to negotiate connection: #{response.status}"
+					raise ConnectionError.new("Failed to negotiate connection!", response.unwrap)
 				end
 				
 				protocol = response.headers[SEC_WEBSOCKET_PROTOCOL]&.first

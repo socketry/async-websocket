@@ -18,6 +18,8 @@ ClientExamples = Sus::Shared("a websocket client") do
 				end
 				
 				connection.close
+			rescue Protocol::WebSocket::ClosedError
+				# Ignore this error.
 			end or Protocol::HTTP::Response[404, {}, []]
 		end
 	end
@@ -125,7 +127,24 @@ ClientExamples = Sus::Shared("a websocket client") do
 		it "raises an error when the server doesn't support websockets" do
 			expect do
 				Async::WebSocket::Client.connect(client_endpoint) {}
-			end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Failed to negotiate connection/)
+			end.to raise_exception(Async::WebSocket::ConnectionError, message: be =~ /Failed to negotiate connection/)
+		end
+	end
+	
+	with 'deliberate failure response' do
+		let(:app) do
+			Protocol::HTTP::Middleware.for do |request|
+				Protocol::HTTP::Response[401, {}, ["You are not allowed!"]]
+			end
+		end
+		
+		it "raises a connection error when the server responds with an error" do
+			begin
+				Async::WebSocket::Client.connect(client_endpoint) {}
+			rescue Async::WebSocket::ConnectionError => error
+				expect(error.response.status).to be == 401
+				expect(error.response.read).to be == "You are not allowed!"
+			end
 		end
 	end
 end
@@ -134,7 +153,7 @@ FailedToNegotiate = Sus::Shared("a failed websocket request") do
 	it 'raises an error' do
 		expect do
 			Async::WebSocket::Client.connect(client_endpoint) {}
-		end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Failed to negotiate connection/)
+		end.to raise_exception(Async::WebSocket::ConnectionError, message: be =~ /Failed to negotiate connection/)
 	end
 end
 

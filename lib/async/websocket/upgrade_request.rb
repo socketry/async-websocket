@@ -33,6 +33,10 @@ module Async
 					@response.close
 				end
 				
+				def unwrap
+					@response.buffered!
+				end
+				
 				attr_accessor :response
 				
 				def stream?

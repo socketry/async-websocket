@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
 	spec.required_ruby_version = ">= 3.1"
 	
 	spec.add_dependency "async-http", "~> 0.54"
+	spec.add_dependency "protocol-http", ">= 0.28.1"
 	spec.add_dependency "protocol-rack", "~> 0.5"
 	spec.add_dependency "protocol-websocket", "~> 0.15"
 end
