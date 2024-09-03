@@ -62,9 +62,10 @@ module Async
 					
 					begin
 						yield connection
+						
 					ensure
-						connection.close
-						client.close
+						connection&.close
+						client&.close
 					end
 				end
 			end

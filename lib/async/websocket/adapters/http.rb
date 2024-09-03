@@ -39,8 +39,9 @@ module Async
 							connection = handler.call(framer, protocol, extensions)
 							
 							yield connection
-							
-							connection.close unless connection.closed?
+						ensure
+							connection&.close
+							stream.close
 						end
 						
 						# Once we get to this point, we no longer need to hold on to the request:
