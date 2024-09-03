@@ -19,6 +19,11 @@ module Async
 					headers.add(SEC_WEBSOCKET_PROTOCOL, protocol)
 				end
 				
+				# For compatibility with HTTP/1 websockets proxied over HTTP/2, we process the accept nounce here:
+				if accept_nounce = request.headers[SEC_WEBSOCKET_KEY]&.first
+					headers.add(SEC_WEBSOCKET_ACCEPT, Nounce.accept_digest(accept_nounce))
+				end
+				
 				body = Async::HTTP::Body::Hijack.wrap(request, &block)
 				
 				super(request.version, 200, headers, body)

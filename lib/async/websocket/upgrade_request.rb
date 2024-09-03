@@ -81,6 +81,7 @@ module Async
 						raise ProtocolError, "Invalid accept digest, expected #{expected_accept_digest.inspect}, got #{accept_digest.inspect}!"
 					end
 				end
+				
 				verified = accept_digest && Array(response.protocol).map(&:downcase) == %w(websocket) && response.headers['connection']&.include?('upgrade')
 				
 				return Wrapper.new(response, verified: verified)
