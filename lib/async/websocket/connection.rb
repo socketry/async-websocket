@@ -42,6 +42,10 @@ module Async
 			end
 			
 			attr :protocol
+			
+			def inspect
+				"#<#{self.class} state=#{@state}>"
+			end
 		end
 	end
 end

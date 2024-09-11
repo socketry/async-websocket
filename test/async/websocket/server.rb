@@ -19,6 +19,8 @@ ServerExamples = Sus::Shared('a websocket server') do
 		message = connection.read
 		expect(message.to_str).to be == "Hello World!"
 		
+		connection.shutdown
+	ensure
 		connection.close
 	end
 	
@@ -27,6 +29,8 @@ ServerExamples = Sus::Shared('a websocket server') do
 			connection.send_text("Hello World!")
 			message = connection.read
 			expect(message.to_str).to be == "Hello World!"
+			
+			connection.shutdown
 		end
 	end
 	
@@ -36,6 +40,8 @@ ServerExamples = Sus::Shared('a websocket server') do
 				connection.send_text("Hello World!")
 				message = connection.read
 				expect(message.to_str).to be == "Hello World!"
+				
+				connection.shutdown
 			end
 		end
 	end
