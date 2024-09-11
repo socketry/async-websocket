@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2021-2023, by Samuel Williams.
+# Copyright, 2021-2024, by Samuel Williams.
 # Copyright, 2021, by Aurora Nockert.
 
-require_relative '../connection'
-require_relative '../response'
+require_relative "../connection"
+require_relative "../response"
 
-require 'protocol/websocket/extensions'
+require "protocol/websocket/extensions"
 
 module Async
 	module WebSocket

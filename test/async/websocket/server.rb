@@ -3,15 +3,15 @@
 # Released under the MIT License.
 # Copyright, 2019-2024, by Samuel Williams.
 
-require 'protocol/http/middleware/builder'
+require "protocol/http/middleware/builder"
 
-require 'async/websocket/client'
-require 'async/websocket/server'
-require 'async/websocket/adapters/http'
+require "async/websocket/client"
+require "async/websocket/server"
+require "async/websocket/adapters/http"
 
-require 'sus/fixtures/async/http/server_context'
+require "sus/fixtures/async/http/server_context"
 
-ServerExamples = Sus::Shared('a websocket server') do
+ServerExamples = Sus::Shared("a websocket server") do
 	it "can establish connection" do
 		connection = websocket_client.connect(endpoint.authority, "/server")
 		
@@ -75,10 +75,10 @@ ServerExamples = Sus::Shared('a websocket server') do
 		end
 	end
 	
-	with 'server middleware' do
+	with "server middleware" do
 		let(:app) do
 			Protocol::HTTP::Middleware.build do
-				use Async::WebSocket::Server, protocols: ['echo', 'baz'] do |connection|
+				use Async::WebSocket::Server, protocols: ["echo", "baz"] do |connection|
 					connection.send_text("protocol: #{connection.protocol}")
 					connection.close
 				end
@@ -86,10 +86,10 @@ ServerExamples = Sus::Shared('a websocket server') do
 		end
 		
 		it "can establish connection with explicit protocol" do
-			connection = websocket_client.connect(endpoint.authority, "/server", protocols: ['echo', 'foo', 'bar'])
+			connection = websocket_client.connect(endpoint.authority, "/server", protocols: ["echo", "foo", "bar"])
 			
 			# The negotiated protocol:
-			expect(connection.protocol).to be == 'echo'
+			expect(connection.protocol).to be == "echo"
 			
 			begin
 				expect(connection.read).to be == "protocol: echo"
@@ -117,7 +117,7 @@ describe Async::WebSocket::Server do
 		end
 	end
 	
-	with 'http/1' do
+	with "http/1" do
 		let(:protocol) {Async::HTTP::Protocol::HTTP1}
 		it_behaves_like ServerExamples 
 		
@@ -134,7 +134,7 @@ describe Async::WebSocket::Server do
 		
 		let(:timeout) {nil}
 		
-		with 'broken server' do
+		with "broken server" do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
 					response = Async::WebSocket::Adapters::HTTP.open(request) do |connection|
@@ -145,7 +145,7 @@ describe Async::WebSocket::Server do
 					
 					if response
 						response.tap do
-							response.headers.set('sec-websocket-accept', '2badsheep')
+							response.headers.set("sec-websocket-accept", "2badsheep")
 						end
 					else
 						Protocol::HTTP::Response[404, {}, []]
@@ -161,7 +161,7 @@ describe Async::WebSocket::Server do
 		end
 	end
 	
-	with 'http/2' do
+	with "http/2" do
 		let(:protocol) {Async::HTTP::Protocol::HTTP2}
 		it_behaves_like ServerExamples
 	end

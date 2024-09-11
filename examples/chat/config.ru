@@ -1,11 +1,11 @@
 #!/usr/bin/env -S falcon serve --bind https://localhost:8080 --count 1 -c
 # frozen_string_literal: true
 
-require_relative '../../lib/async/websocket/adapters/rack'
-require 'async/clock'
-require 'async/semaphore'
+require_relative "../../lib/async/websocket/adapters/rack"
+require "async/clock"
+require "async/semaphore"
 
-require 'set'
+require "set"
 
 # GC.disable
 
@@ -70,7 +70,7 @@ class Room
 	end
 	
 	def start_profile
-		require 'ruby-prof' unless defined?(RubyProf)
+		require "ruby-prof" unless defined?(RubyProf)
 		
 		return false if @profile
 		

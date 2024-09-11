@@ -1,7 +1,7 @@
 #!/usr/bin/env -S falcon serve --bind http://127.0.0.1:7070 --count 1 -c
 # frozen_string_literal: true
 
-require 'async/websocket/adapters/rack'
+require "async/websocket/adapters/rack"
 
 app = lambda do |env|
 	response = Async::WebSocket::Adapters::Rack.open(env) do |connection|

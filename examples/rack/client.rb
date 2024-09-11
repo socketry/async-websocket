@@ -4,9 +4,9 @@
 # Released under the MIT License.
 # Copyright, 2019-2024, by Samuel Williams.
 
-require 'async'
-require 'async/http/endpoint'
-require 'async/websocket/client'
+require "async"
+require "async/http/endpoint"
+require "async/websocket/client"
 
 URL = ARGV.pop || "http://127.0.0.1:7070"
 

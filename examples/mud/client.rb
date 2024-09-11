@@ -5,9 +5,9 @@
 # Copyright, 2019-2024, by Samuel Williams.
 # Copyright, 2020, by Juan Antonio Martín Lucas.
 
-require 'async'
-require 'async/http/endpoint'
-require 'async/websocket/client'
+require "async"
+require "async/http/endpoint"
+require "async/websocket/client"
 
 USER = ARGV.pop || "anonymous"
 URL = ARGV.pop || "http://127.0.0.1:7070"

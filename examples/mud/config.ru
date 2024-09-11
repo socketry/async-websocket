@@ -1,7 +1,7 @@
 #!/usr/bin/env -S falcon serve --count 1 --bind http://127.0.0.1:7070 -c
 # frozen_string_literal: true
 
-require 'async/websocket/adapters/rack'
+require "async/websocket/adapters/rack"
 
 class Room
 	def initialize(name, description = nil)

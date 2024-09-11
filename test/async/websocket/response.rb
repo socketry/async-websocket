@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2023, by Samuel Williams.
+# Copyright, 2023-2024, by Samuel Williams.
 
-require 'async/websocket/response'
+require "async/websocket/response"
 
 describe Async::WebSocket::Response do
 	it "fails if the version is not recognized" do

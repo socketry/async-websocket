@@ -4,9 +4,9 @@
 # Released under the MIT License.
 # Copyright, 2018-2024, by Samuel Williams.
 
-require 'async'
-require 'async/http/endpoint'
-require_relative '../../lib/async/websocket/client'
+require "async"
+require "async/http/endpoint"
+require_relative "../../lib/async/websocket/client"
 
 USER = ARGV.pop || "anonymous"
 URL = ARGV.pop || "https://localhost:8080"

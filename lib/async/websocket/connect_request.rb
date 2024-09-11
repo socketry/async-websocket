@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2019-2023, by Samuel Williams.
+# Copyright, 2019-2024, by Samuel Williams.
 # Copyright, 2023, by Thomas Morgan.
 
-require 'protocol/http/request'
-require 'protocol/http/headers'
-require 'protocol/websocket/headers'
-require 'protocol/http/body/readable'
+require "protocol/http/request"
+require "protocol/http/headers"
+require "protocol/websocket/headers"
+require "protocol/http/body/readable"
 
-require 'async/variable'
+require "async/variable"
 
 module Async
 	module WebSocket
@@ -75,7 +75,7 @@ module Async
 				headers.add(SEC_WEBSOCKET_VERSION, String(version))
 				
 				if protocols.any?
-					headers.add(SEC_WEBSOCKET_PROTOCOL, protocols.join(','))
+					headers.add(SEC_WEBSOCKET_PROTOCOL, protocols.join(","))
 				end
 				
 				super(request.scheme, request.authority, ::Protocol::HTTP::Methods::CONNECT, request.path, nil, headers, body, PROTOCOL)

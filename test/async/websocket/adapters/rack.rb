@@ -4,18 +4,18 @@
 # Copyright, 2015-2024, by Samuel Williams.
 # Copyright, 2019, by Simon Crocker.
 
-require 'async/websocket'
-require 'async/websocket/client'
-require 'async/websocket/adapters/rack'
-require 'async/websocket/rack_application'
+require "async/websocket"
+require "async/websocket/client"
+require "async/websocket/adapters/rack"
+require "async/websocket/rack_application"
 
 describe Async::WebSocket::Adapters::Rack do
 	it "can determine whether a rack env is a websocket request" do
 		expect(Async::WebSocket::Adapters::Rack.websocket?(Rack::MockRequest.env_for("/"))).to be == false
-		expect(Async::WebSocket::Adapters::Rack.websocket?(Rack::MockRequest.env_for("/", 'HTTP_CONNECTION' => 'upgrade', 'HTTP_UPGRADE' => 'websocket'))).to be == true
+		expect(Async::WebSocket::Adapters::Rack.websocket?(Rack::MockRequest.env_for("/", "HTTP_CONNECTION" => "upgrade", "HTTP_UPGRADE" => "websocket"))).to be == true
 	end
 	
-	with 'rack application' do
+	with "rack application" do
 		include Async::WebSocket::RackApplication
 		
 		it "can make non-websocket connection to server" do
@@ -50,8 +50,8 @@ describe Async::WebSocket::Adapters::Rack do
 		end
 		
 		it "should negotiate protocol" do
-			Async::WebSocket::Client.connect(client_endpoint, protocols: ['ws']) do |connection|
-				expect(connection.protocol).to be == 'ws'
+			Async::WebSocket::Client.connect(client_endpoint, protocols: ["ws"]) do |connection|
+				expect(connection.protocol).to be == "ws"
 			end
 		end
 	end

@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2023, by Samuel Williams.
+# Copyright, 2023-2024, by Samuel Williams.
 # Copyright, 2023, by Thomas Morgan.
 
-require 'async/websocket/client'
-require 'async/websocket/adapters/http'
+require "async/websocket/client"
+require "async/websocket/adapters/http"
 
-require 'sus/fixtures/async/http/server_context'
+require "sus/fixtures/async/http/server_context"
 
 ClientExamples = Sus::Shared("a websocket client") do
 	let(:app) do
@@ -26,7 +26,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 		end
 	end
 	
-	with '#send_close' do
+	with "#send_close" do
 		it "can read incoming messages and then close" do
 			connection = Async::WebSocket::Client.connect(client_endpoint)
 			3.times do
@@ -49,7 +49,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 		end
 	end
 	
-	with '#close' do
+	with "#close" do
 		it "can connect to a websocket server and close underlying client" do
 			Async do |task|
 				connection = Async::WebSocket::Client.connect(client_endpoint)
@@ -87,7 +87,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 			end
 		end
 
-		it 'closes with custom error' do
+		it "closes with custom error" do
 			connection = Async::WebSocket::Client.connect(client_endpoint)
 			message = connection.read
 			
@@ -97,7 +97,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 		end
 	end
 	
-	with '#connect' do
+	with "#connect" do
 		let(:app) do
 			Protocol::HTTP::Middleware.for do |request|
 				Async::WebSocket::Adapters::HTTP.open(request) do |connection|
@@ -113,15 +113,15 @@ ClientExamples = Sus::Shared("a websocket client") do
 		it "fully populates the request" do
 			connection = Async::WebSocket::Client.connect(client_endpoint)
 			expect(connection.read.to_str).to be =~ /authority: localhost:\d+/
-			expect(connection.read.to_str).to be == 'path: /'
+			expect(connection.read.to_str).to be == "path: /"
 			expect(connection.read.to_str).to be == 'protocol: ["websocket"]'
-			expect(connection.read.to_str).to be == 'scheme: http'
+			expect(connection.read.to_str).to be == "scheme: http"
 		ensure
 			connection&.close
 		end
 	end
 	
-	with 'missing support for websockets' do
+	with "missing support for websockets" do
 		let(:app) do
 			Protocol::HTTP::Middleware.for do |request|
 				Protocol::HTTP::Response[404, {}, []]
@@ -135,7 +135,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 		end
 	end
 	
-	with 'deliberate failure response' do
+	with "deliberate failure response" do
 		let(:app) do
 			Protocol::HTTP::Middleware.for do |request|
 				Protocol::HTTP::Response[401, {}, ["You are not allowed!"]]
@@ -154,7 +154,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 end
 
 FailedToNegotiate = Sus::Shared("a failed websocket request") do
-	it 'raises an error' do
+	it "raises an error" do
 		expect do
 			Async::WebSocket::Client.connect(client_endpoint) {}
 		end.to raise_exception(Async::WebSocket::ConnectionError, message: be =~ /Failed to negotiate connection/)
@@ -164,63 +164,63 @@ end
 describe Async::WebSocket::Client do
 	include Sus::Fixtures::Async::HTTP::ServerContext
 
-	with 'http/1' do
+	with "http/1" do
 		let(:protocol) {Async::HTTP::Protocol::HTTP1}
 		it_behaves_like ClientExamples
 		
 		def valid_headers(request)
 			{
-				'connection' => 'upgrade',
-				'upgrade' => 'websocket',
-				'sec-websocket-accept' => Protocol::WebSocket::Headers::Nounce.accept_digest(request.headers['sec-websocket-key'].first)
+				"connection" => "upgrade",
+				"upgrade" => "websocket",
+				"sec-websocket-accept" => Protocol::WebSocket::Headers::Nounce.accept_digest(request.headers["sec-websocket-key"].first)
 			}
 		end
 		
-		with 'invalid connection header' do
+		with "invalid connection header" do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
-					Protocol::HTTP::Response[101, valid_headers(request).except('connection'), []]
+					Protocol::HTTP::Response[101, valid_headers(request).except("connection"), []]
 				end
 			end
 			
 			it_behaves_like FailedToNegotiate
 		end
 		
-		with 'invalid upgrade header' do
+		with "invalid upgrade header" do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
-					Protocol::HTTP::Response[101, valid_headers(request).except('upgrade'), []]
+					Protocol::HTTP::Response[101, valid_headers(request).except("upgrade"), []]
 				end
 			end
 			
 			it_behaves_like FailedToNegotiate
 		end
 		
-		with 'invalid sec-websocket-accept header' do
+		with "invalid sec-websocket-accept header" do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
-					Protocol::HTTP::Response[101, valid_headers(request).merge('sec-websocket-accept'=>'wrong-digest'), []]
+					Protocol::HTTP::Response[101, valid_headers(request).merge("sec-websocket-accept"=>"wrong-digest"), []]
 				end
 			end
 			
-			it 'raises an error' do
+			it "raises an error" do
 				expect do
 					Async::WebSocket::Client.connect(client_endpoint) {}
 				end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Invalid accept digest/)
 			end
 		end
 		
-		with 'missing sec-websocket-accept header' do
+		with "missing sec-websocket-accept header" do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
-					Protocol::HTTP::Response[101, valid_headers(request).except('sec-websocket-accept'), []]
+					Protocol::HTTP::Response[101, valid_headers(request).except("sec-websocket-accept"), []]
 				end
 			end
 			
 			it_behaves_like FailedToNegotiate
 		end
 		
-		with 'invalid status' do
+		with "invalid status" do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
 					Protocol::HTTP::Response[403, valid_headers(request), []]
@@ -231,11 +231,11 @@ describe Async::WebSocket::Client do
 		end
 	end
 	
-	with 'http/2' do
+	with "http/2" do
 		let(:protocol) {Async::HTTP::Protocol::HTTP2}
 		it_behaves_like ClientExamples
 		
-		with 'invalid status' do
+		with "invalid status" do
 			let(:app) do
 				Protocol::HTTP::Middleware.for do |request|
 					Protocol::HTTP::Response[403, {}, []]

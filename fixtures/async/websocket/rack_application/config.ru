@@ -1,8 +1,8 @@
 #!/usr/bin/env -S falcon serve --bind http://localhost:7070 --count 1 -c
 # frozen_string_literal: true
 
-require 'async/websocket/adapters/rack'
-require 'set'
+require "async/websocket/adapters/rack"
+require "set"
 
 $connections = Set.new
 
@@ -26,7 +26,7 @@ end
 use ClosedLogger
 
 run do |env|
-	Async::WebSocket::Adapters::Rack.open(env, protocols: ['ws']) do |connection|
+	Async::WebSocket::Adapters::Rack.open(env, protocols: ["ws"]) do |connection|
 		$connections << connection
 		
 		begin

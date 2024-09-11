@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2023, by Samuel Williams.
+# Copyright, 2023-2024, by Samuel Williams.
 
-require 'async/websocket/request'
+require "async/websocket/request"
 
 describe Async::WebSocket::Request do
 	let(:request) {subject.new("https", "localhost", "/")}
@@ -27,7 +27,7 @@ describe Async::WebSocket::Request do
 		end.to raise_exception(Async::WebSocket::UnsupportedVersionError, message: be =~ /Unsupported HTTP version/)
 	end
 	
-	with '#to_s' do
+	with "#to_s" do
 		it "should generate string representation" do
 			expect(request.to_s).to be =~ %r{https://localhost/}
 		end

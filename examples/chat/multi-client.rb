@@ -4,13 +4,13 @@
 # Released under the MIT License.
 # Copyright, 2019-2024, by Samuel Williams.
 
-require 'async'
-require 'async/semaphore'
-require 'async/clock'
-require 'async/http/endpoint'
-require_relative '../../lib/async/websocket/client'
+require "async"
+require "async/semaphore"
+require "async/clock"
+require "async/http/endpoint"
+require_relative "../../lib/async/websocket/client"
 
-require 'samovar'
+require "samovar"
 
 # GC.disable
 GC::Profiler.enable

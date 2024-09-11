@@ -4,7 +4,7 @@
 # Copyright, 2015-2024, by Samuel Williams.
 # Copyright, 2019, by Simon Crocker.
 
-require 'async/websocket/connection'
+require "async/websocket/connection"
 
 describe Async::WebSocket::Connection do
 	let(:framer) {Protocol::WebSocket::Framer.new(nil)}

@@ -4,10 +4,10 @@
 # Copyright, 2018-2024, by Samuel Williams.
 # Copyright, 2019, by Simon Crocker.
 
-require_relative 'connection'
-require_relative 'response'
+require_relative "connection"
+require_relative "response"
 
-require 'protocol/http/middleware'
+require "protocol/http/middleware"
 
 module Async
 	module WebSocket

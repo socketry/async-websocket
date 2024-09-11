@@ -3,8 +3,8 @@
 # Released under the MIT License.
 # Copyright, 2022-2024, by Samuel Williams.
 
-require 'sus/fixtures/async/http/server_context'
-require 'protocol/rack/adapter'
+require "sus/fixtures/async/http/server_context"
+require "protocol/rack/adapter"
 
 module Async
 	module WebSocket
@@ -12,7 +12,7 @@ module Async
 			include Sus::Fixtures::Async::HTTP::ServerContext
 			
 			def builder
-				Rack::Builder.parse_file(File.expand_path('rack_application/config.ru', __dir__))
+				Rack::Builder.parse_file(File.expand_path("rack_application/config.ru", __dir__))
 			end
 			
 			def app

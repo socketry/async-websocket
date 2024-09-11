@@ -6,16 +6,16 @@
 # Copyright, 2019, by Janko Marohnić.
 # Copyright, 2023, by Thomas Morgan.
 
-require_relative 'request'
-require_relative 'connection'
+require_relative "request"
+require_relative "connection"
 
-require 'protocol/websocket/headers'
-require 'protocol/websocket/extensions'
-require 'protocol/http/middleware'
+require "protocol/websocket/headers"
+require "protocol/websocket/extensions"
+require "protocol/http/middleware"
 
-require 'async/http/client'
+require "async/http/client"
 
-require 'delegate'
+require "delegate"
 
 module Async
 	module WebSocket

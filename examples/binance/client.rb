@@ -4,9 +4,9 @@
 # Released under the MIT License.
 # Copyright, 2021-2024, by Samuel Williams.
 
-require 'async'
-require 'async/http'
-require 'async/websocket'
+require "async"
+require "async/http"
+require "async/websocket"
 
 URL = "wss://stream.binance.com:9443/ws/btcusdt@bookTicker"
 

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2021-2023, by Samuel Williams.
+# Copyright, 2021-2024, by Samuel Williams.
 # Copyright, 2023, by Emily Love Mills.
 
-require_relative 'rack'
+require_relative "rack"
 
 module Async
 	module WebSocket

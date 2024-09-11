@@ -5,15 +5,13 @@
 # Copyright, 2023, by Thomas Morgan.
 # Copyright, 2024, by Ryu Sato.
 
-require 'protocol/http/middleware'
-require 'protocol/http/request'
+require "protocol/http/middleware"
+require "protocol/http/request"
 
-require 'protocol/http/headers'
-require 'protocol/websocket/headers'
+require "protocol/http/headers"
+require "protocol/websocket/headers"
 
-require 'securerandom'
-
-require_relative 'error'
+require_relative "error"
 
 module Async
 	module WebSocket
@@ -65,7 +63,7 @@ module Async
 				headers.add(SEC_WEBSOCKET_VERSION, String(version))
 				
 				if protocols.any?
-					headers.add(SEC_WEBSOCKET_PROTOCOL, protocols.join(','))
+					headers.add(SEC_WEBSOCKET_PROTOCOL, protocols.join(","))
 				end
 				
 				super(request.scheme, request.authority, ::Protocol::HTTP::Methods::GET, request.path, nil, headers, nil, PROTOCOL)
@@ -82,7 +80,7 @@ module Async
 					end
 				end
 				
-				verified = accept_digest && Array(response.protocol).map(&:downcase) == %w(websocket) && response.headers['connection']&.include?('upgrade')
+				verified = accept_digest && Array(response.protocol).map(&:downcase) == %w(websocket) && response.headers["connection"]&.include?("upgrade")
 				
 				return Wrapper.new(response, verified: verified)
 			end
