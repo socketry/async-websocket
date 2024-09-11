@@ -17,9 +17,11 @@ ClientExamples = Sus::Shared("a websocket client") do
 					connection.write(message)
 				end
 				
-				connection.close
+				connection.shutdown
 			rescue Protocol::WebSocket::ClosedError
 				# Ignore this error.
+			ensure
+				connection.close
 			end or Protocol::HTTP::Response[404, {}, []]
 		end
 	end
@@ -56,6 +58,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 				expect(message.to_str).to be == "Hello World!"
 				
 				connection.close
+				
 				expect(task.children).to be(:empty?)
 			end.wait
 		end
@@ -68,6 +71,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 				expect(message.to_str).to be == "Hello World!"
 				
 				connection.close(Protocol::WebSocket::Error::GOING_AWAY, "Bye!")
+				
 				expect(task.children).to be(:empty?)
 			end.wait
 		end
