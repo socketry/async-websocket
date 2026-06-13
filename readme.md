@@ -12,6 +12,10 @@ Please see the [project documentation](https://socketry.github.io/async-websocke
 
   - [Rails Integration](https://socketry.github.io/async-websocket/guides/rails-integration/index) - This guide explains how to use `async-websocket` with Rails.
 
+## Releases
+
+There are no documented releases.
+
 ## Contributing
 
 We welcome contributions to this project.
@@ -21,6 +25,22 @@ We welcome contributions to this project.
 3.  Commit your changes (`git commit -am 'Add some feature'`).
 4.  Push to the branch (`git push origin my-new-feature`).
 5.  Create new Pull Request.
+
+### Running Tests
+
+To run the test suite:
+
+``` shell
+bundle exec sus
+```
+
+### Making Releases
+
+To make a new release:
+
+``` shell
+bundle exec bake gem:release:patch # or minor or major
+```
 
 ### Developer Certificate of Origin
 

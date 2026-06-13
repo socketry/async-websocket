@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright, 2015-2024, by Samuel Williams.  
+Copyright, 2015-2026, by Samuel Williams.  
 Copyright, 2019, by Bryan Powell.  
 Copyright, 2019, by Simon Crocker.  
 Copyright, 2019, by Michel Boaventura.  

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2019-2024, by Samuel Williams.
+# Copyright, 2019-2026, by Samuel Williams.
 
 require "protocol/http/middleware/builder"
 
@@ -155,7 +155,7 @@ describe Async::WebSocket::Server do
 			
 			it "fails with protocol error if nounce doesn't match" do
 				expect do
-					websocket_client.connect(endpoint.authority, "/server") {}
+					websocket_client.connect(endpoint.authority, "/server"){}
 				end.to raise_exception(Protocol::WebSocket::ProtocolError)
 			end
 		end

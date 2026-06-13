@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 	
 	spec.files = Dir.glob(["{lib}/**/*", "*.md"], File::FNM_DOTMATCH, base: __dir__)
 	
-	spec.required_ruby_version = ">= 3.1"
+	spec.required_ruby_version = ">= 3.3"
 	
 	spec.add_dependency "async-http", "~> 0.76"
 	spec.add_dependency "protocol-http", "~> 0.34"

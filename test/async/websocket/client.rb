@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2023-2024, by Samuel Williams.
+# Copyright, 2023-2026, by Samuel Williams.
 # Copyright, 2023, by Thomas Morgan.
 
 require "async/websocket/client"
@@ -86,7 +86,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 				end
 			end
 		end
-
+		
 		it "closes with custom error" do
 			connection = Async::WebSocket::Client.connect(client_endpoint)
 			message = connection.read
@@ -130,7 +130,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 		
 		it "raises an error when the server doesn't support websockets" do
 			expect do
-				Async::WebSocket::Client.connect(client_endpoint) {}
+				Async::WebSocket::Client.connect(client_endpoint){}
 			end.to raise_exception(Async::WebSocket::ConnectionError, message: be =~ /Failed to negotiate connection/)
 		end
 	end
@@ -144,7 +144,7 @@ ClientExamples = Sus::Shared("a websocket client") do
 		
 		it "raises a connection error when the server responds with an error" do
 			begin
-				Async::WebSocket::Client.connect(client_endpoint) {}
+				Async::WebSocket::Client.connect(client_endpoint){}
 			rescue Async::WebSocket::ConnectionError => error
 				expect(error.response.status).to be == 401
 				expect(error.response.read).to be == "You are not allowed!"
@@ -156,14 +156,14 @@ end
 FailedToNegotiate = Sus::Shared("a failed websocket request") do
 	it "raises an error" do
 		expect do
-			Async::WebSocket::Client.connect(client_endpoint) {}
+			Async::WebSocket::Client.connect(client_endpoint){}
 		end.to raise_exception(Async::WebSocket::ConnectionError, message: be =~ /Failed to negotiate connection/)
 	end
 end
 
 describe Async::WebSocket::Client do
 	include Sus::Fixtures::Async::HTTP::ServerContext
-
+	
 	with "http/1" do
 		let(:protocol) {Async::HTTP::Protocol::HTTP1}
 		it_behaves_like ClientExamples
@@ -205,7 +205,7 @@ describe Async::WebSocket::Client do
 			
 			it "raises an error" do
 				expect do
-					Async::WebSocket::Client.connect(client_endpoint) {}
+					Async::WebSocket::Client.connect(client_endpoint){}
 				end.to raise_exception(Async::WebSocket::ProtocolError, message: be =~ /Invalid accept digest/)
 			end
 		end

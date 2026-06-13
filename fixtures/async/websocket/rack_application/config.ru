@@ -10,14 +10,14 @@ class ClosedLogger
 	def initialize(app)
 		@app = app
 	end
-
+	
 	def call(env)
 		response = @app.call(env)
-
+		
 		response[2] = Rack::BodyProxy.new(response[2]) do
 			Console.debug(self, "Connection closed!")
 		end
-
+		
 		return response
 	end
 end

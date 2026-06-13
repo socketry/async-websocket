@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2019-2024, by Samuel Williams.
+# Copyright, 2019-2026, by Samuel Williams.
 
 require "async"
 require "async/http/endpoint"
@@ -17,7 +17,7 @@ Async do |task|
 		1000.times do
 			connection.send_text("Hello World")
 			connection.flush
-		
+			
 			puts connection.read
 		end
 	end

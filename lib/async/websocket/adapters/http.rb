@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2021-2024, by Samuel Williams.
+# Copyright, 2021-2026, by Samuel Williams.
 # Copyright, 2021, by Aurora Nockert.
 
 require_relative "../connection"
@@ -16,7 +16,7 @@ module Async
 				include ::Protocol::WebSocket::Headers
 				
 				def self.websocket?(request)
-					Array(request.protocol).any? { |e| e.casecmp?(PROTOCOL) }
+					Array(request.protocol).any?{|e| e.casecmp?(PROTOCOL)}
 				end
 				
 				def self.open(request, headers: [], protocols: [], handler: Connection, extensions: ::Protocol::WebSocket::Extensions::Server.default, **options, &block)

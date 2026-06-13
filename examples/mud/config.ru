@@ -135,7 +135,7 @@ class Server
 				user.handle(message)
 			end
 		ensure
-			# Console.logger.error(self, $!) if $!
+			# Console.error(self, $!) if $!
 			user.close
 		end or @app.call(env)
 	end
@@ -143,4 +143,4 @@ end
 
 use Server
 
-run lambda {|env| [200, {}, []]}
+run lambda{|env| [200, {}, []]}

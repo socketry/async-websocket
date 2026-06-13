@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2019-2024, by Samuel Williams.
+# Copyright, 2019-2026, by Samuel Williams.
 
 require "async"
 require "async/semaphore"
@@ -56,7 +56,7 @@ class Command < Samovar::Command
 			client = Async::WebSocket::Client.open(endpoint)
 			start_time = Async::Clock.now
 			
-			progress = Console.logger.progress(client, count)
+			progress = Console.progress(client, count)
 			
 			count.times do |i|
 				connections.enqueue(client.connect(endpoint.authority, endpoint.path))
@@ -66,18 +66,18 @@ class Command < Samovar::Command
 				if (i % 10000).zero?
 					count = i+1
 					duration = Async::Clock.now - start_time
-					Console.logger.info(self) {"Made #{count} connections: #{(count/duration).round(2)} connections/second..."}
+					Console.info(self){"Made #{count} connections: #{(count/duration).round(2)} connections/second..."}
 				end
 				
 				# if (i % 10000).zero?
 				# 	duration = Async::Clock.measure{GC.start(full_mark: false, immediate_sweep: false)}
-				# 	Console.logger.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
+				# 	Console.info(self) {"GC.start duration=#{duration.round(2)}s GC.count=#{GC.count}"}
 				# end
 			end
 			
 			connections.enqueue(nil)
 			
-			Console.logger.info(self) {"Finished top level connection loop..."}
+			Console.info(self){"Finished top level connection loop..."}
 			
 			GC::Profiler.report
 		end
