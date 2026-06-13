@@ -16,7 +16,7 @@ Please see the [project documentation](https://socketry.github.io/async-websocke
 
 Please see the [project releases](https://socketry.github.io/async-websocket/releases/index) for all releases.
 
-### Unreleased
+### v0.30.1
 
 ### v0.30.0
 
