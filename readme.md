@@ -14,7 +14,55 @@ Please see the [project documentation](https://socketry.github.io/async-websocke
 
 ## Releases
 
-There are no documented releases.
+Please see the [project releases](https://socketry.github.io/async-websocket/releases/index) for all releases.
+
+### Unreleased
+
+### v0.30.0
+
+  - Improved error handling.
+  - Modernized the gem and refreshed dependencies.
+
+### v0.29.1
+
+  - Improved `connection&.close` handling.
+
+### v0.29.0
+
+  - Added nonce processing to HTTP/2 WebSockets for HTTP/1 proxy compatibility.
+
+### v0.28.0
+
+  - Added `ConnectionError` with access to the failed response.
+
+### v0.27.0
+
+  - Updated the Rails integration guide summary.
+  - Modernized the gem and refreshed dependencies.
+
+### v0.26.2
+
+  - Compared requested WebSocket protocols case-insensitively.
+  - Updated the Binance, chat, MUD, and Rack examples.
+  - Improved documentation, including the Rails integration guide.
+  - Removed obsolete Polygon.io and Utopia examples.
+
+### v0.26.1
+
+  - Removed the direct dependency on `async-io`.
+  - Updated the `sus-fixtures-async-http` dependency.
+
+### v0.26.0
+
+  - Improved validation of WebSocket requests.
+  - Ensured HTTP/2 requests include the `:scheme` pseudo-header.
+  - Improved HTTP/1 stream checks.
+  - Fixed arguments passed to 404 responses.
+  - Updated documentation and links.
+
+### v0.25.1
+
+  - Updated the minimum `protocol-websocket` version.
 
 ## Contributing
 
