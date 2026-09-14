@@ -56,7 +56,7 @@ class Command < Samovar::Command
 			client = Async::WebSocket::Client.open(endpoint)
 			start_time = Async::Clock.now
 			
-			progress = Console.progress(client, count)
+			progress = Console::Progress.new(client, count)
 			
 			count.times do |i|
 				connections.enqueue(client.connect(endpoint.authority, endpoint.path))
