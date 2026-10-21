@@ -6,6 +6,7 @@
 
 require_relative "connection"
 require_relative "response"
+require_relative "adapters/http"
 
 require "protocol/http/middleware"
 
