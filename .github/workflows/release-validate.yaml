@@ -1,0 +1,32 @@
+name: Validate release
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+env:
+  BUNDLE_WITH: maintenance
+
+jobs:
+  validate:
+    name: Release validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+      - name: Regenerate release content
+        env:
+          RELEASE_BASE: ${{ github.event.pull_request.base.sha }}
+        run: bundle exec bake gem:github:release:validate "base=$RELEASE_BASE"
+      - name: Build unsigned package
+        run: bundle exec bake gem:build signing_key=false

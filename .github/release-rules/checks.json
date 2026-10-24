@@ -1,0 +1,61 @@
+{
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": [
+        "refs/heads/main"
+      ],
+      "exclude": []
+    }
+  },
+  "name": "Gem release checks",
+  "bypass_actors": [
+    {
+      "actor_id": 5,
+      "actor_type": "RepositoryRole",
+      "bypass_mode": "pull_request"
+    }
+  ],
+  "rules": [
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "3.3 on ubuntu"
+          },
+          {
+            "context": "3.3 on macos"
+          },
+          {
+            "context": "3.4 on ubuntu"
+          },
+          {
+            "context": "3.4 on macos"
+          },
+          {
+            "context": "4.0 on ubuntu"
+          },
+          {
+            "context": "4.0 on macos"
+          },
+          {
+            "context": "check"
+          },
+          {
+            "context": "ruby on ubuntu"
+          },
+          {
+            "context": "ruby on macos"
+          },
+          {
+            "context": "Release validation"
+          }
+        ]
+      }
+    }
+  ]
+}

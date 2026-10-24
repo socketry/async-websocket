@@ -1,0 +1,18 @@
+---
+schema: 1
+repository: socketry/async-websocket
+branch: main
+checks:
+- 3.3 on ubuntu
+- 3.3 on macos
+- 3.4 on ubuntu
+- 3.4 on macos
+- 4.0 on ubuntu
+- 4.0 on macos
+- check
+- ruby on ubuntu
+- ruby on macos
+- Release validation
+approvals: 2
+ruby: '3.4'
+environment: rubygems

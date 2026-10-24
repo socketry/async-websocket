@@ -8,9 +8,9 @@ source "https://rubygems.org"
 gemspec
 
 group :maintenance, optional: true do
-	gem "bake-gem"
-	gem "bake-modernize"
-	gem "bake-releases"
+	gem "bake-gem-github", "~> 0.7.0"
+	gem "bake-modernize", "~> 0.66"
+	gem "agent-context"
 	
 	gem "decode"
 	
