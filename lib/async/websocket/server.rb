@@ -3,6 +3,7 @@
 # Released under the MIT License.
 # Copyright, 2018-2024, by Samuel Williams.
 # Copyright, 2019, by Simon Crocker.
+# Copyright, 2026, by William T. Nelson.
 
 require_relative "connection"
 require_relative "response"
