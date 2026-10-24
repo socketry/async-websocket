@@ -16,7 +16,7 @@ Please see the [project documentation](https://socketry.github.io/async-websocke
 
 Please see the [project releases](https://socketry.github.io/async-websocket/releases/index) for all releases.
 
-### Unreleased
+### v0.30.2
 
   - Adopt reviewed GitHub release pull requests, RubyGems Trusted Publishing, and release attestations instead of legacy certificate signing.
 
