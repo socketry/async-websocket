@@ -1,0 +1,102 @@
+name: Publish release
+
+# Inspect the exact pushed commit and publish only a validated, merged release PR.
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  BUNDLE_WITH: maintenance
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.inspect.outputs.release }}
+      commit: ${{ steps.inspect.outputs.commit }}
+      pull_request: ${{ steps.inspect.outputs.pull_request }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+      - id: inspect
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ github.sha }}
+        run: bundle exec bake gem:github:release:resolve
+
+  publish:
+    needs: inspect
+    if: needs.inspect.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    environment: rubygems
+    concurrency:
+      group: release-publish
+      cancel-in-progress: false
+      queue: max
+    env:
+      RELEASE_PR: ${{ needs.inspect.outputs.pull_request }}
+    permissions:
+      contents: write
+      pull-requests: read
+      actions: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Inspection verified this merged commit belongs to the default branch.
+          ref: ${{ needs.inspect.outputs.commit }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          rubygems: '4.0.21'
+          bundler-cache: true
+      - name: Build or restore artifact
+        id: build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bundle exec bake gem:github:release:build
+      - name: Sign RubyGems attestation
+        if: steps.build.outputs.restored != 'true'
+        env:
+          PACKAGE: ${{ steps.build.outputs.package }}
+        run: gem exec sigstore-cli:0.2.3 sign "$PACKAGE" --bundle "$PACKAGE.sigstore.json"
+      - name: Attest gem and release receipt
+        if: steps.build.outputs.restored != 'true'
+        id: attest
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            ${{ steps.build.outputs.package }}
+            pkg/release.json
+      - name: Retain provenance bundle
+        if: steps.build.outputs.restored != 'true'
+        env:
+          ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: cp "$ATTESTATION_BUNDLE" pkg/provenance.sigstore.json
+      - name: Preserve release before upload
+        if: steps.build.outputs.restored != 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.build.outputs.artifact }}
+          path: pkg/
+          if-no-files-found: error
+          retention-days: 90
+      - uses: rubygems/configure-rubygems-credentials@main
+      - name: Verify, publish, and finalize
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bundle exec bake gem:github:release:publish

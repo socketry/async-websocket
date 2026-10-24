@@ -1,5 +1,9 @@
 # Releases
 
+## Unreleased
+
+  - Adopt reviewed GitHub release pull requests, RubyGems Trusted Publishing, and release attestations instead of legacy certificate signing.
+
 ## v0.30.1
 
 ## v0.30.0

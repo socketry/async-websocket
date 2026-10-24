@@ -16,6 +16,10 @@ Please see the [project documentation](https://socketry.github.io/async-websocke
 
 Please see the [project releases](https://socketry.github.io/async-websocket/releases/index) for all releases.
 
+### Unreleased
+
+  - Adopt reviewed GitHub release pull requests, RubyGems Trusted Publishing, and release attestations instead of legacy certificate signing.
+
 ### v0.30.1
 
 ### v0.30.0
@@ -60,10 +64,6 @@ Please see the [project releases](https://socketry.github.io/async-websocket/rel
   - Fixed arguments passed to 404 responses.
   - Updated documentation and links.
 
-### v0.25.1
-
-  - Updated the minimum `protocol-websocket` version.
-
 ## Contributing
 
 We welcome contributions to this project.
@@ -84,11 +84,13 @@ bundle exec sus
 
 ### Making Releases
 
-To make a new release:
+To prepare a release pull request:
 
 ``` shell
-bundle exec bake gem:release:patch # or minor or major
+bundle exec bake gem:github:release:patch # or minor or major
 ```
+
+See [bake-gem-github](https://github.com/socketry/bake-gem-github) for setup and publishing details.
 
 ### Developer Certificate of Origin
 
